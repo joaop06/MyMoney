@@ -1,6 +1,7 @@
 import * as React from 'react';
 import 'react-native-gesture-handler';
 import MMKV from './src/utils/MMKV/MMKV.jsx';
+import DataBase from './src/utils/Data/DataBase.jsx'
 import { enableScreens } from 'react-native-screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';

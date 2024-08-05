@@ -56,7 +56,7 @@ const Home = (data) => {
 
     const handleConfirm = async () => {
         hideAlert();
-        await MMKV.set('isLoggedIn', false);
+        await MMKV.set('lastLoggedInUser', '');
         navigation.reset({
             index: 0,
             routes: [{ name: 'Loading' }]

@@ -5,8 +5,8 @@
  *  - Opções de login via e-mail/senha, Google ou Facebook.
  * 
 */
+import Users from '../Data/Users';
 import MMKV from '../utils/MMKV/MMKV';
-import DataBase from '../utils/Data/DataBase';
 
 import { StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
@@ -38,6 +38,7 @@ const Loading = () => {
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [nameUser, setNameUser] = useState('')
 
 
     const setValue = (value, state, temporary = false, time = 2500) => {
@@ -63,10 +64,20 @@ const Loading = () => {
              * 
              * Aqui ficará a Requisição de Login
              */
-            const sortNumError = Math.floor(Math.random() * 4) + 1
-            if (sortNumError !== 1) {
-                await MMKV.set('isLoggedIn', true);
+            if (!username || !password) {
+                return setValue(
+                    { error: true, message: 'Preencha os campos corretamente' },
+                    setRequestLogin,
+                    true
+                )
+            }
+
+            const { success, user } = await Users.login(username, password)
+            setNameUser(user?.name || '')
+
+            if (success) {
                 setValue(true, setIsLoggedIn)
+                await MMKV.set('lastLoggedInUser', username);
 
             } else {
                 setValue(
@@ -83,10 +94,9 @@ const Loading = () => {
     useEffect(() => { }, [verifyingSession])
     useEffect(() => {
         (async () => {
-            const test = await DataBase.find('Users')
-            // console.log('Teste de Busca de usuários:', test)
+            const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
+            const isLogged = await Users.verifyIsLoggedIn(lastLoggedInUser)
 
-            const isLogged = await MMKV.find('isLoggedIn')
             setValue(isLogged, setIsLoggedIn)
             return isLogged
         })()
@@ -109,7 +119,7 @@ const Loading = () => {
     return (
         <Container style={{ justifyContent: 'space-between' }}>
 
-            <Title style={{ marginTop: 50 }}>Olá, {'João'}!</Title>
+            <Title style={{ marginTop: 50 }}>{!isLoggedIn ? 'Olá!' : `Olá, ${nameUser}!`}</Title>
             <Text>{isLoggedIn ? 'Seja Bem-vindo!' : 'Bem-vindo de volta! Faça seu Login'}</Text>
 
             <Container style={styles.credentialContainer}>

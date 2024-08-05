@@ -1,7 +1,5 @@
 import * as React from 'react';
 import 'react-native-gesture-handler';
-import MMKV from './src/utils/MMKV/MMKV.jsx';
-import DataBase from './src/utils/Data/DataBase.jsx'
 import { enableScreens } from 'react-native-screens';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -16,7 +14,12 @@ import Releases from './src/pages/Releases.jsx';
 import Categories from './src/pages/Categories.jsx';
 import MonthEndClosing from './src/pages/MonthEndClosing.jsx';
 
+
+// import DataBase from './src/Data/DataBase';
+import MMKV from './src/utils/MMKV/MMKV.jsx';
 MMKV.init()
+
+
 enableScreens();
 const Stack = createStackNavigator();
 const newStackScreen = (name, component, options = {}) => {

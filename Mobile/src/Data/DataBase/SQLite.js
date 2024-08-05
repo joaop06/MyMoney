@@ -1,4 +1,4 @@
-import TablesConfig from './TablesConfig';
+import { tables as Tables } from './TablesConfig.js';
 import SQLiteStorage from 'react-native-sqlite-storage';
 
 export default class SQLite {
@@ -10,26 +10,26 @@ export default class SQLite {
         this._db = value
     }
 
-
     static async init() {
         try {
-            if (process.env.HOMOLOGATION == 'true') {
-                console.log('Ambiente de homologação')
-            }
-
             SQLite.db = SQLiteStorage.openDatabase(
                 { name: 'mymoney.db', location: 'default' },
                 () => console.log('Database opened successfully'),
                 (error) => console.error('Error opening database', error)
             );
 
-
             const instance = new SQLite()
-            TablesConfig.forEach(async table => {
-                const { configAttributes } = table
-                const attrs = Object.keys(configAttributes).map(attrName => {
+            if (false) {
+                const tableNames = Tables.map(table => table.name)
+                tableNames.forEach(async table => await instance.executeQuery(`DROP TABLE ${table}`))
+                console.log('Tabelas Dropadas com sucesso!')
+            }
 
-                    const attribute = configAttributes[attrName]
+            Tables.forEach(async table => {
+                const { attributes } = table
+                const attrs = Object.keys(attributes).map(attrName => {
+
+                    const attribute = attributes[attrName]
 
                     let { primaryKey, autoIncrement, allowNull, defaultValue } = attribute
 
@@ -54,6 +54,13 @@ export default class SQLite {
                 await instance.executeQuery(sql)
             })
 
+
+            let userTest = await instance.executeQuery('SELECT * FROM Users WHERE username = "test"')
+            if (userTest.rows.raw().length === 0) {
+                await instance.executeQuery(`INSERT INTO Users (name, username, password) VALUES ('Usuário Teste', 'test', '1')`)
+                console.log('Usuário Teste inserido')
+            }
+
         } catch (e) {
             console.error(e)
         }
@@ -71,5 +78,3 @@ export default class SQLite {
         })
     }
 }
-
-module.exports = SQLite;

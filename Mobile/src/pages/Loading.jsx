@@ -6,6 +6,8 @@
  * 
 */
 import MMKV from '../utils/MMKV/MMKV';
+import DataBase from '../utils/Data/DataBase';
+
 import { StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Colors } from '../utils/Stylization';
@@ -81,6 +83,9 @@ const Loading = () => {
     useEffect(() => { }, [verifyingSession])
     useEffect(() => {
         (async () => {
+            const test = await DataBase.find('Users')
+            // console.log('Teste de Busca de usuários:', test)
+
             const isLogged = await MMKV.find('isLoggedIn')
             setValue(isLogged, setIsLoggedIn)
             return isLogged

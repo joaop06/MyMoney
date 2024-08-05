@@ -1,42 +1,49 @@
-import CreateTables from './SqlCreateTables';
-import SQLite from 'react-native-sqlite-storage';
-
-
-var instanceDb
-class DataBase {
-    constructor(SQLiteDb) {
-        this.db = SQLiteDb
+import SQLite from './SQLite';
+class DataBase extends SQLite {
+    constructor() {
+        super()
     }
 
-    static async init() {
-        try {
-            const SQLiteDb = SQLite.openDatabase(
-                { name: 'mymoney.db', location: 'default' },
-                () => console.log('Database opened successfully'),
-                (error) => console.log('Error opening database', error)
-            );
+    treatWhere(where) {
 
-            const instanceDb = new DataBase(SQLiteDb);
-            CreateTables.forEach(async sql => await instanceDb.queries(sql))
+    }
+
+    async find(tableName, where = {}) {
+        try {
+            let sqlWhere = []
+            Object.keys(where).map(key => {
+                const value = where[key]
+                const typeValue = typeof value
+
+                sqlWhere.push(`${key} = ${value}`)
+            })
+            const whereClause = sqlWhere.length > 0 ? `WHERE ${sqlWhere.join(' AND ')}` : ''
+
+            const result = await super.executeQuery(`SELECT * FROM ${tableName} ${whereClause}`)
+
+            return {
+                rows: result.rows.raw(),
+                totalCount: result.rows.length,
+            }
 
         } catch (e) {
-            console.error(e)
+            throw e
         }
     }
 
-    async queries(sql) {
-        this.db.transaction(tx => {
-            const res = tx.executeSql(sql, [],
-                (transaction, resultSet) => {
-                    console.log('transaction', transaction);
-                    console.log('resultSet', resultSet);
-                },
-                (error) => console.log('Error creating table', error)
-            )
-            console.log('res', res)
-        })
+    async create(tableName, object) {
+        await super.executeQuery(`INSERT INTO Users (name, username, password) VALUES ('João Pedro', 'joaop', 'jp123')`)
+
+    }
+
+    async update(tableName, object, where = {}) {
+
+    }
+
+    async delete(tableName, id) {
+
     }
 }
 
 DataBase.init()
-export default instanceDb;
+export default new DataBase();

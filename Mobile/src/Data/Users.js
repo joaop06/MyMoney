@@ -1,3 +1,4 @@
+import Releases from "./Releases";
 import CRUD from "./DataBase/CRUD";
 
 class Users extends CRUD {
@@ -18,7 +19,7 @@ class Users extends CRUD {
             return tokenIsExpired
 
         } catch (e) {
-            console.error(e)
+            console.error('Erro ao verificar usuário logado', e)
         }
     }
 
@@ -32,6 +33,7 @@ class Users extends CRUD {
             const now = new Date()
             now.setHours(now.getHours() + 3)
             const tokenExpiresAt = now.toISOString()
+
             await super.update({ tokenExpiresAt: `'${tokenExpiresAt}'` }, { id: user.id })
 
             success = true
@@ -40,6 +42,28 @@ class Users extends CRUD {
 
         return { success }
     }
+
+    async updateTotalBalance(userId) {
+        try {
+            const releases = await Releases.find({ userId })
+
+            let totalBalance = 0.00
+            releases.rows.forEach(release => {
+                if (release.type === 'RENTS') totalBalance += release.value
+                else if (release.type === 'SPENDING') totalBalance -= release.value
+            })
+
+            await super.update({ totalBalance }, { id: userId })
+
+            console.log(`Saldo Total atualizado: R$ ${totalBalance}`)
+
+            return totalBalance
+
+        } catch (e) {
+            console.error('Erro ao atualizar Saldo Total', e)
+        }
+    }
+
 }
 
 export default new Users('Users');

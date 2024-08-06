@@ -3,26 +3,16 @@ module.exports = {
         type: "string",
         defaultValue: "",
     },
-    isLoggedIn: {
-        type: "boolean",
-        defaultValue: false,
-    },
-    username: {
-        type: "string",
-        defaultValue: "João",
-    },
-    totalBalance: {
+    userId: {
         type: "number",
-        defaultValue: 0.00,
+        defaultValue: null,
     },
-    spending: {
-        type: "object",
-        subType: "array",
-        defaultValue: [],
+    accessToken: {
+        type: "string",
+        defaultValue: "",
     },
-    rents: {
-        type: "object",
-        subType: "array",
-        defaultValue: [],
+    refreshToken: {
+        type: "string",
+        defaultValue: "",
     },
 }

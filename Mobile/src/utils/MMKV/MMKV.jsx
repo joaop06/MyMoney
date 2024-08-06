@@ -17,6 +17,8 @@ export default class MMKV {
         const attributesName = Object.keys(Attributes);
 
         for (const attrName of attributesName) {
+            if (false) await this.remove(attrName)
+
             const isStarting = true
             const { value, attribute } = await this.find(attrName, isStarting);
 
@@ -45,13 +47,10 @@ export default class MMKV {
                     value = await this.storage.getInt(item);
                     break
 
-                case 'object':
-                    value = await this.storage.getArray(item);
-                    break
-
                 default:
                     throw new Error(`Unsupported type for attribute '${item}'`);
             }
+            if (item === 'userData') value = JSON.parse(value)
 
             return isStarting ? { value, attribute } : value
 
@@ -65,13 +64,15 @@ export default class MMKV {
             const attribute = Attributes[key];
             if (!attribute) throw new Error(`Unknown attribute '${key}'`);
 
-
             const type = typeof value
-            if (type !== attribute.type) throw new Error(`Invalid type from attribute '${key}`);
-
             switch (type) {
                 case 'string':
-                    await this.storage.setString(key, value);
+                    if (key === 'userData') {
+                        await this.storage.setString(key, JSON.stringify(value));
+
+                    } else {
+                        await this.storage.setString(key, value);
+                    }
                     break
 
                 case 'boolean':
@@ -80,13 +81,6 @@ export default class MMKV {
 
                 case 'number':
                     await this.storage.setInt(key, value);
-                    break
-
-                case 'object':
-
-                    if (attribute.subType === 'array') {
-                        await this.storage.setArray(key, value);
-                    }
                     break
             }
 
@@ -104,29 +98,6 @@ export default class MMKV {
 
         } catch (e) {
             console.error(e);
-        }
-    }
-
-    static async updateTotalBalance() {
-        try {
-            const rents = await this.find('rents')
-            const spending = await this.find('spending')
-
-            let totalBalance = 0.00
-            const allReleases = rents.concat(spending)
-
-            allReleases.forEach(release => {
-                if (release.type === 'rents') totalBalance += release.value
-                else if (release.type === 'spending') totalBalance -= release.value
-            })
-
-            await this.set('totalBalance', totalBalance)
-            console.log(`Saldo Total atualizado: R$ ${totalBalance}`)
-
-            return totalBalance
-
-        } catch (e) {
-            console.error('Erro ao atualizar Saldo Total', e)
         }
     }
 }

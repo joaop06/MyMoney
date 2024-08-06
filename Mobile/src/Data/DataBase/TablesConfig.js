@@ -15,11 +15,6 @@ module.exports = {
                     primaryKey: true,
                     autoIncrement: true,
                 },
-                totalBalance: {
-                    type: 'REAL',
-                    allowNull: true,
-                    defaultValue: 0.00,
-                },
                 name: {
                     type: 'TEXT',
                     allowNull: true,
@@ -32,32 +27,24 @@ module.exports = {
                     type: 'TEXT',
                     allowNull: true,
                 },
-                isLoggedIn: {
+                totalBalance: {
+                    type: 'REAL',
                     allowNull: true,
-                    type: 'BOOLEAN',
-                    defaultValue: false,
+                    defaultValue: 0.00,
                 },
                 tokenExpiresAt: {
                     allowNull: true,
                     type: 'DATETIME',
                 },
-                accessToken: {
-                    type: 'TEXT',
-                    allowNull: true,
-                },
-                refreshToken: {
-                    type: 'TEXT',
-                    allowNull: true,
-                },
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
+                    defaultValue: new Date().toISOString()
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
+                    defaultValue: new Date().toISOString()
                 },
             }
         },
@@ -70,10 +57,6 @@ module.exports = {
                     primaryKey: true,
                     autoIncrement: true,
                 },
-                userId: {
-                    type: 'INTEGER',
-                    allowNull: false,
-                },
                 value: {
                     type: 'REAL',
                     allowNull: true,
@@ -81,6 +64,10 @@ module.exports = {
                 title: {
                     type: 'TEXT',
                     allowNull: true,
+                },
+                userId: {
+                    type: 'INTEGER',
+                    allowNull: false,
                 },
                 description: {
                     type: 'TEXT',
@@ -93,12 +80,12 @@ module.exports = {
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
+                    defaultValue: new Date().toISOString()
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
+                    defaultValue: new Date().toISOString()
                 },
             }
         }

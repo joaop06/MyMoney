@@ -52,16 +52,16 @@ const Loading = () => {
         if (actionButtonName === 'Acessar') {
             if (isLoggedIn) {
                 navigation.navigate('Main');
+
             } else {
-                setValue('Entrar', setActionButtonName)
                 setValue(true, setShowCredentialEntry)
+                setValue('Entrar', setActionButtonName)
             }
 
         } else if (actionButtonName === 'Entrar') {
 
             /** 
              * Simulação aleatória de erro
-             * 
              * Aqui ficará a Requisição de Login
              */
             if (!username || !password) {
@@ -76,7 +76,10 @@ const Loading = () => {
             setNameUser(user?.name || '')
 
             if (success) {
-                setValue(true, setIsLoggedIn)
+                setValue(true, setIsLoggedIn);
+
+                console.log('user.id vindo do banco:', user.id, typeof user.id)
+                await MMKV.set('userId', user.id);
                 await MMKV.set('lastLoggedInUser', username);
 
             } else {
@@ -109,7 +112,9 @@ const Loading = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setValue(false, setVerifyingSession);
-            if (isLoggedIn && actionButtonName !== 'Acessar') navigation.navigate('Main');
+            if (isLoggedIn && actionButtonName !== 'Acessar') {
+                navigation.navigate('Main');
+            }
         }, 500);
 
         return () => clearTimeout(timer);

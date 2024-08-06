@@ -8,14 +8,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 /**
  * Pages
 */
-import Home from './src/pages/Home/index.jsx';
 import Loading from './src/pages/Loading.jsx';
-import Releases from './src/pages/Releases.jsx';
 import Categories from './src/pages/Categories.jsx';
+import EditRelease from './src/pages/EditRelease.jsx';
+import NewReleases from './src/pages/NewReleases.jsx';
+import HomeScreen from './src/pages/Home/HomeScreen.jsx';
 import MonthEndClosing from './src/pages/MonthEndClosing.jsx';
 
 
-// import DataBase from './src/Data/DataBase';
 import MMKV from './src/utils/MMKV/MMKV.jsx';
 MMKV.init()
 
@@ -35,8 +35,8 @@ const newTabScreen = (name, component, options = {}) => {
 function MyTabs() {
   return (
     <Tab.Navigator>
-      {newTabScreen(Home.name, Home.screen, Home.config)}
-      {newTabScreen(Releases.name, Releases.screen, Releases.config)}
+      {newTabScreen(HomeScreen.name, HomeScreen.screen, HomeScreen.config)}
+      {newTabScreen(NewReleases.name, NewReleases.screen, NewReleases.config)}
       {newTabScreen(Categories.name, Categories.screen, Categories.config)}
       {newTabScreen(MonthEndClosing.name, MonthEndClosing.screen, MonthEndClosing.config)}
     </Tab.Navigator>
@@ -49,6 +49,7 @@ function App() {
       <Stack.Navigator>
         {newStackScreen(Loading.name, Loading.screen, Loading.config)}
         {newStackScreen('Main', MyTabs, { headerShown: false })}
+        {newStackScreen(EditRelease.name, EditRelease.screen, EditRelease.config)}
       </Stack.Navigator>
     </NavigationContainer>
   )

@@ -5,8 +5,11 @@
  *  - Campos: valor, data, categoria, descrição.
  *  - Botões para salvar ou cancelar lançamento.
 */
+import Users from "../Data/Users";
 import MMKV from "../utils/MMKV/MMKV";
-import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import Releases from "../Data/Releases";
+
+import { StyleSheet } from 'react-native';
 import { useState, useEffect } from "react";
 import { useNavigation } from '@react-navigation/native';
 import { Colors, Components } from "../utils/Stylization";
@@ -25,7 +28,7 @@ import Container from "../components/Container";
 var navigation
 const { Icons } = Components
 const config = {
-    title: 'Lançamentos',
+    title: 'Novo Lançamento',
     headerShown: false,
     tabBarIcon: () => <MaterialCommunityIcons
         name="rocket-launch"
@@ -34,17 +37,16 @@ const config = {
     />
 };
 
-const Releases = ({ route }) => {
+const NewReleases = ({ route }) => {
     navigation = useNavigation();
-    const origin = route?.params?.origin
-
-    const optionsToSelect = [{ name: 'Despesas', origin: 'spending' }, { name: 'Rendas', origin: 'rents' }]
+    const origin = route?.params?.origin;
 
     const [title, setTitle] = useState('');
     const [value, setValue] = useState(0.00);
     const [description, setDescription] = useState('');
-    const [typeRelease, setTypeRelease] = useState((origin || 'spending').toLowerCase());
+    const [type, setType] = useState((origin || 'spending').toUpperCase());
 
+    const optionsToSelect = [{ name: 'Despesas', origin: 'SPENDING' }, { name: 'Rendas', origin: 'RENTS' }]
 
     /*
      * Limpa os campos ao montar o componente ou ao mudar de tela
@@ -67,32 +69,27 @@ const Releases = ({ route }) => {
         }
 
         // Todos os Lançamentos do tipo selecionado
-        const releases = await MMKV.find(typeRelease)
+        const userId = await MMKV.find('userId');
 
         // Adiciona o Novo Lançamento
         const newRelease = {
             value,
             title,
+            userId,
             description,
-            type: typeRelease,
-            created_at: new Date(),
-            updated_at: new Date(),
-            id: releases.length + 1,
+            type: type,
         }
-        releases.push(newRelease)
-        await MMKV.set(typeRelease, releases)
+        await Releases.create(newRelease)
 
 
         // Atualiza Saldo Total e Redireciona para tela inicial
-        navigation.navigate('Início', { totalBalance: await MMKV.updateTotalBalance() });
+        navigation.navigate('HomeScreen', { totalBalance: await Users.updateTotalBalance(userId) });
     }
 
 
     return (
         <KeyboardAwareScrollView
-            extraHeight={20}
             enableOnAndroid={true}
-            extraScrollHeight={20}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={styles.container}
         >
@@ -112,10 +109,10 @@ const Releases = ({ route }) => {
                     <Button
                         key={index}
                         style={{
-                            button: styles.containerButton(typeRelease, option.origin),
-                            text: styles.containerButtonText(typeRelease, option.origin)
+                            button: styles.containerButton(type, option.origin),
+                            text: styles.containerButtonText(type, option.origin)
                         }}
-                        onPress={() => setTypeRelease(option.origin)}
+                        onPress={() => setType(option.origin)}
                     >
                         {option.name}
                     </Button>
@@ -133,7 +130,7 @@ const Releases = ({ route }) => {
             <Label style={styles.labelTextArea}>Descrição</Label>
             <TextArea
                 onChangeValue={setDescription}
-                placeholder={`Descrição sobre esta ${typeRelease.includes('spending') ? 'despesa' : 'renda'}`}
+                placeholder={`Descrição sobre esta ${type.includes('spending') ? 'despesa' : 'renda'}`}
             />
 
 
@@ -168,9 +165,9 @@ const styles = StyleSheet.create({
         maxHeight: ScreenHeight * 0.1,
         backgroundColor: Colors.grey_lighten,
     },
-    containerButton: (typeRelease, origin) => {
+    containerButton: (type, origin) => {
         origin = origin.toLowerCase()
-        typeRelease = typeRelease.toLowerCase().replace('releases', '')
+        type = type.toLowerCase().replace('releases', '')
 
         let selected = {}
         const defaultStyle = {
@@ -178,19 +175,19 @@ const styles = StyleSheet.create({
             borderRadius: 20,
             maxWidth: ScreenWidth * 0.25,
             minWidth: ScreenWidth * 0.25,
-            backgroundColor: typeRelease === origin ? Colors.blue : Colors.white,
+            backgroundColor: type === origin ? Colors.blue : Colors.white,
         }
 
         return { ...defaultStyle, ...selected, }
     },
-    containerButtonText: (typeRelease, origin) => {
+    containerButtonText: (type, origin) => {
         origin = origin.toLowerCase()
-        typeRelease = typeRelease.toLowerCase().replace('releases', '')
+        type = type.toLowerCase().replace('releases', '')
 
         let selected = {}
         const defaultStyle = {
             fontSize: 16,
-            color: typeRelease === origin ? Colors.white : Colors.black
+            color: type === origin ? Colors.white : Colors.black
         }
 
         return { ...defaultStyle, ...selected, }
@@ -211,4 +208,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default { name: 'Releases', screen: Releases, config };
+export default { name: 'NewReleases', screen: NewReleases, config };

@@ -6,7 +6,9 @@
  *  - Gráficos de entradas e saídas.
  *  - Alertas de gastos altos e de proximidade ao valor recebido no salário do mês.
  */
+import Users from '../../Data/Users';
 import MMKV from '../../utils/MMKV/MMKV';
+
 import { Components } from '../../utils/Stylization';
 import { StyleSheet, BackHandler } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -37,15 +39,15 @@ const { screen: Spending, name: NameSpending } = require('./Spending');
 
 const Home = (data) => {
     navigation = useNavigation();
-    const [isAlertVisible, setIsAlertVisible] = useState(false);
-
     const totalBalance = data.route?.params?.totalBalance;
+    const [isAlertVisible, setIsAlertVisible] = useState(false);
     const [balance, setBalance] = useState(totalBalance || 0.00);
 
     useEffect(() => {
         const interval = setInterval(async () => {
-            setBalance(await MMKV.find('totalBalance'))
-        }, 3000)
+            const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
+            setBalance(userData.totalBalance)
+        }, 500)
 
         return () => clearInterval(interval)
     }, [])
@@ -105,4 +107,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default { name: 'Início', screen: Home, config };
+export default { name: 'HomeScreen', screen: Home, config };

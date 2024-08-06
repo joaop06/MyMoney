@@ -44,7 +44,7 @@ const NewReleases = ({ route }) => {
     const [title, setTitle] = useState('');
     const [value, setValue] = useState(0.00);
     const [description, setDescription] = useState('');
-    const [type, setType] = useState((origin || 'spending').toUpperCase());
+    const [type, setType] = useState((origin || 'SPENDING').toUpperCase());
 
     const optionsToSelect = [{ name: 'Despesas', origin: 'SPENDING' }, { name: 'Rendas', origin: 'RENTS' }]
 
@@ -55,35 +55,42 @@ const NewReleases = ({ route }) => {
         setTitle('');
         setValue(0.00);
         setDescription('');
-    }, []);
+    }, [route]);
 
-
-    const onChangeValue = (value = 0.00) => setValue(parseFloat(value))
 
     const handleNewRelease = async () => {
+        const parsedValue = parseFloat(value) || 0.00;
 
+        
         // Tratativa de campos vazios para inserção
-        if (value <= 0.00 || !title) {
-            console.error(`Campos obrigatórios não preenchidos: Value ${value} // Title '${title}'`)
+        if (parsedValue <= 0.00 || !title) {
+            console.error(`Campos obrigatórios não preenchidos: Value ${parsedValue} // Title '${title}'`)
             return
         }
 
-        // Todos os Lançamentos do tipo selecionado
-        const userId = await MMKV.find('userId');
+        try {
+            // Todos os Lançamentos do tipo selecionado
+            const userId = await MMKV.find('userId');
+    
+            // Adiciona o Novo Lançamento
+            const newRelease = {
+                type,
+                title,
+                userId,
+                description,
+                value: parsedValue,
+            }
+            await Releases.create(newRelease)
+    
+    
+            // Atualiza Saldo Total e Redireciona para tela inicial
+            const totalBalance = await Users.updateTotalBalance(userId);
+            navigation.navigate('HomeScreen', { totalBalance });
 
-        // Adiciona o Novo Lançamento
-        const newRelease = {
-            value,
-            title,
-            userId,
-            description,
-            type: type,
+        catch (e) {
+            console.error("Erro ao adicionar lançamento:", error);
+            // Implementar Modal de Alerta: Ex: Alert.alert('Erro', 'Não foi possível adicionar o lançamento.');
         }
-        await Releases.create(newRelease)
-
-
-        // Atualiza Saldo Total e Redireciona para tela inicial
-        navigation.navigate('HomeScreen', { totalBalance: await Users.updateTotalBalance(userId) });
     }
 
 
@@ -98,10 +105,10 @@ const NewReleases = ({ route }) => {
             <Input
                 value={value}
                 label="Valor *"
-                inputMode="decimal"
+                inputMode="decimal-pad"
                 style={styles.valueRelease}
                 placeholder="Ex: R$ 100,00"
-                onChangeValue={onChangeValue}
+                onChangeValue={setValue}
             />
 
             <Container style={styles.containerSelector}>
@@ -129,8 +136,9 @@ const NewReleases = ({ route }) => {
 
             <Label style={styles.labelTextArea}>Descrição</Label>
             <TextArea
+                value={description}
                 onChangeValue={setDescription}
-                placeholder={`Descrição sobre esta ${type.includes('spending') ? 'despesa' : 'renda'}`}
+                placeholder={`Descrição sobre esta ${type.includes('SPENDING') ? 'despesa' : 'renda'}`}
             />
 
 
@@ -146,7 +154,6 @@ const NewReleases = ({ route }) => {
 
 const styles = StyleSheet.create({
     container: {
-        // flexGrow: 1,
         paddingTop: 50,
         alignItems: 'center',
         maxHeight: ScreenHeight * 1.1,
@@ -166,31 +173,19 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.grey_lighten,
     },
     containerButton: (type, origin) => {
-        origin = origin.toLowerCase()
-        type = type.toLowerCase().replace('releases', '')
-
-        let selected = {}
-        const defaultStyle = {
+        return {
             borderWidth: 1,
             borderRadius: 20,
             maxWidth: ScreenWidth * 0.25,
             minWidth: ScreenWidth * 0.25,
             backgroundColor: type === origin ? Colors.blue : Colors.white,
         }
-
-        return { ...defaultStyle, ...selected, }
     },
     containerButtonText: (type, origin) => {
-        origin = origin.toLowerCase()
-        type = type.toLowerCase().replace('releases', '')
-
-        let selected = {}
-        const defaultStyle = {
+        return {
             fontSize: 16,
             color: type === origin ? Colors.white : Colors.black
         }
-
-        return { ...defaultStyle, ...selected, }
     },
     titleRelease: {
         marginTop: 85,

@@ -55,13 +55,13 @@ const NewReleases = ({ route }) => {
         setTitle('');
         setValue(0.00);
         setDescription('');
-    }, [route]);
+    }, [route, navigation]);
 
 
     const handleNewRelease = async () => {
         const parsedValue = parseFloat(value) || 0.00;
 
-        
+
         // Tratativa de campos vazios para inserção
         if (parsedValue <= 0.00 || !title) {
             console.error(`Campos obrigatórios não preenchidos: Value ${parsedValue} // Title '${title}'`)
@@ -71,7 +71,7 @@ const NewReleases = ({ route }) => {
         try {
             // Todos os Lançamentos do tipo selecionado
             const userId = await MMKV.find('userId');
-    
+
             // Adiciona o Novo Lançamento
             const newRelease = {
                 type,
@@ -81,13 +81,13 @@ const NewReleases = ({ route }) => {
                 value: parsedValue,
             }
             await Releases.create(newRelease)
-    
-    
+
+
             // Atualiza Saldo Total e Redireciona para tela inicial
             const totalBalance = await Users.updateTotalBalance(userId);
             navigation.navigate('HomeScreen', { totalBalance });
 
-        catch (e) {
+        } catch (e) {
             console.error("Erro ao adicionar lançamento:", error);
             // Implementar Modal de Alerta: Ex: Alert.alert('Erro', 'Não foi possível adicionar o lançamento.');
         }

@@ -10,13 +10,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 /** Components */
 import List from '../../components/List';
 import Text from '../../components/Text';
-import Title from '../../components/Title';
 import Button from '../../components/Button';
 import Container from '../../components/Container';
 
 
 const Rents = () => {
     const [dataRents, setDataRents] = useState([]);
+    const [totalRents, setTotalRents] = useState(0.00);
 
     const fetchData = async () => {
         if (process.env.FETCH_DATA_RENTS_IN_PROGRESS != true) {
@@ -28,6 +28,10 @@ const Rents = () => {
                     userId: await MMKV.find('userId'),
                 })
                 setDataRents(rows)
+
+                let totalRentsValue = 0.00
+                rows.forEach(rent => totalRentsValue += rent.value)
+                setTotalRents(totalRentsValue)
 
             } catch (e) {
                 console.error(e)
@@ -57,7 +61,7 @@ const Rents = () => {
 
     return (
         <Container>
-            <Title>Rendas: {dataRents.length}</Title>
+            <Text style={{ fontSize: 16 }}>Rendas Totais: {(totalRents).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
 
             <List
                 data={dataRents}

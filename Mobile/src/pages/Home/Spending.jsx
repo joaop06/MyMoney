@@ -10,13 +10,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 /** Components */
 import List from '../../components/List';
 import Text from '../../components/Text';
-import Title from '../../components/Title';
 import Button from '../../components/Button';
 import Container from '../../components/Container';
 
 
 const Spending = () => {
     const [dataSpending, setDataSpending] = useState([]);
+    const [totalSpending, setTotalSpending] = useState([]);
 
     const fetchData = async () => {
         if (process.env.FETCH_DATA_SPENDING_IN_PROGRESS != true) {
@@ -28,6 +28,10 @@ const Spending = () => {
                     userId: await MMKV.find('userId'),
                 })
                 setDataSpending(rows)
+
+                let totalSpendingValue = 0.00
+                rows.forEach(rent => totalSpendingValue += rent.value)
+                setTotalSpending(totalSpendingValue)
 
             } catch (e) {
                 console.error(e)
@@ -57,7 +61,7 @@ const Spending = () => {
 
     return (
         <Container>
-            <Title>Despesas: {dataSpending.length}</Title>
+            <Text style={{ fontSize: 16 }}>Despesas Totais: {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
 
             <List
                 data={dataSpending}

@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 /**
  * Pages
 */
+import SignUp from './src/pages/SignUp.jsx';
 import Loading from './src/pages/Loading.jsx';
 import Categories from './src/pages/Categories.jsx';
 import EditRelease from './src/pages/EditRelease.jsx';
@@ -29,6 +30,7 @@ const newStackScreen = (name, component, options = {}) => {
 const Tab = createBottomTabNavigator();
 const newTabScreen = (name, component, options = {}) => {
   return <Tab.Screen name={name} component={component} options={options} />
+  return <Tab.Screen name={name} component={component} options={{ headerTitleStyle: { color }, headerStyle: { backgroundColor } }} />
 }
 
 
@@ -49,6 +51,7 @@ function App() {
       <Stack.Navigator>
         {newStackScreen(Loading.name, Loading.screen, Loading.config)}
         {newStackScreen('Main', MyTabs, { headerShown: false })}
+        {newStackScreen(SignUp.name, SignUp.screen, SignUp.config)}
         {newStackScreen(EditRelease.name, EditRelease.screen, EditRelease.config)}
       </Stack.Navigator>
     </NavigationContainer>

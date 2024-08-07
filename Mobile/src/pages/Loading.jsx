@@ -77,8 +77,6 @@ const Loading = () => {
 
             if (success) {
                 setValue(true, setIsLoggedIn);
-
-                console.log('user.id vindo do banco:', user.id, typeof user.id)
                 await MMKV.set('userId', user.id);
                 await MMKV.set('lastLoggedInUser', username);
 
@@ -149,6 +147,8 @@ const Loading = () => {
                         >
                             {requestLogin?.message || ''}
                         </Text>
+
+                        <Text style={{ fontSize: 14 }}>Ainda não possui conta? <Text onPress={() => navigation.navigate('SignUp')} style={{ color: Colors.blue, fontSize: 14 }}>Cadastre-se</Text></Text>
                     </>
                 )}
 

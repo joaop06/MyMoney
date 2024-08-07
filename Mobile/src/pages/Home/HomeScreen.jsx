@@ -18,6 +18,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 /** Components */
+import Text from '../../components/Text';
 import Alert from '../../components/Alert';
 import Title from '../../components/Title';
 import Container from '../../components/Container';
@@ -83,7 +84,7 @@ const Home = (data) => {
             <Alert isVisible={isAlertVisible} onCancel={hideAlert} onConfirm={handleConfirm} />
 
 
-            <Title style={styles.balance}>Saldo  {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title >
+            <Title style={styles.balance}>Saldo {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title >
 
             <Tab.Navigator style={styles.containerTab} onStateChange={state => handleTabChange(state)}>
                 <Tab.Screen name={NameSpending} component={Spending} />
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
     balance: {
         fontSize: 24,
         marginTop: 25,
-        marginBottom: 25,
+        marginBottom: 15,
         fontWeight: 'bold',
     },
     containerTab: {

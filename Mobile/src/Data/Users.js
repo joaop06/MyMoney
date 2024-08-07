@@ -7,6 +7,21 @@ class Users extends CRUD {
         this.tableName = tableName;
     }
 
+    async create(object) {
+        try {
+            const findUsername = await super.find({ username: object.username })
+            if (findUsername?.rows?.length > 0) {
+                throw new Error('Usuário já cadastrado')
+            }
+
+            return await super.create(object)
+
+        } catch (e) {
+            console.error(e)
+            throw e
+        }
+    }
+
     async verifyIsLoggedIn(username = '') {
         try {
             if (username === '') return false
@@ -14,7 +29,7 @@ class Users extends CRUD {
             let user = await super.find({ username })
             user = user.rows[0]
 
-            const tokenIsExpired = new Date(user.tokenExpiresAt || new Date()) > new Date()
+            const tokenIsExpired = new Date(user?.tokenExpiresAt || new Date()) > new Date()
 
             return tokenIsExpired
 
@@ -63,7 +78,6 @@ class Users extends CRUD {
             console.error('Erro ao atualizar Saldo Total', e)
         }
     }
-
 }
 
 export default new Users('Users');

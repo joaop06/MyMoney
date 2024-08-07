@@ -10,7 +10,8 @@ export default class CRUD extends SQLite {
     treatTableAttrsOnSql(object, options = {}) {
         const { joinWith, onlyValue } = options
 
-        let sqlAttrs = Object.keys(object).map(key => {
+        const sqlAttrs = []
+        Object.keys(object).forEach(key => {
             const value = object[key]
 
             // Encontra Tabela manipulada
@@ -19,10 +20,10 @@ export default class CRUD extends SQLite {
 
             if (attributeInTable) {
                 if (onlyValue) {
-                    return attributeInTable.type === 'TEXT' ? `'${value}'` : value
+                    sqlAttrs.push(attributeInTable.type === 'TEXT' ? `'${value}'` : value)
 
                 } else {
-                    return attributeInTable.type === 'TEXT' ? `${key} = '${value}'` : `${key} = ${value}`
+                    sqlAttrs.push(attributeInTable.type === 'TEXT' ? `${key} = '${value}'` : `${key} = ${value}`)
                 }
             }
         })
@@ -53,26 +54,9 @@ export default class CRUD extends SQLite {
     async create(object) {
         const objectAttributes = Object.keys(object)
         const fieldsToCreate = this.treatTableAttrsOnSql(object, { joinWith: ',', onlyValue: true })
-        const table = Tables.find(table => table.name === this.tableName)
-
-        const attributes = Object.keys(table.attributes)
-            .map(key => {
-                const findAttr = objectAttributes.find(objKey => objKey === key)
-
-                if (findAttr && !['id', 'createdAt', 'updatedAt'].includes(key)) {
-                    return key
-                }
-            })
-            .filter(key => key !== undefined)
-            .join(',')
-
-        console.log(`
-            INSERT INTO ${this.tableName} (${attributes})
-            VALUES (${fieldsToCreate})
-        `)
 
         return await super.executeQuery(`
-            INSERT INTO ${this.tableName} (${attributes})
+            INSERT INTO ${this.tableName} (${objectAttributes})
             VALUES (${fieldsToCreate})
         `)
     }

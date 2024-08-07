@@ -57,10 +57,17 @@ const NewReleases = ({ route }) => {
         setDescription('');
     }, [route, navigation]);
 
+    const formatAndSetValue = (value, state, temporary = false, time = 3500) => {
+        if (typeof value === 'string') value = value.trim()
+
+        state(value)
+        if (temporary) {
+            setTimeout(() => state(null), time)
+        }
+    }
 
     const handleNewRelease = async () => {
         const parsedValue = parseFloat(value) || 0.00;
-
 
         // Tratativa de campos vazios para inserção
         if (parsedValue <= 0.00 || !title) {
@@ -108,7 +115,7 @@ const NewReleases = ({ route }) => {
                 inputMode="decimal-pad"
                 style={styles.valueRelease}
                 placeholder="Ex: R$ 100,00"
-                onChangeValue={setValue}
+                onChangeValue={(value) => formatAndSetValue(value, setValue)}
             />
 
             <Container style={styles.containerSelector}>
@@ -129,7 +136,7 @@ const NewReleases = ({ route }) => {
             <Input
                 value={title}
                 label="Título *"
-                onChangeValue={setTitle}
+                onChangeValue={(value) => formatAndSetValue(value, setTitle)}
                 style={styles.titleRelease}
                 placeholder="Título do lançamento"
             />
@@ -137,7 +144,7 @@ const NewReleases = ({ route }) => {
             <Label style={styles.labelTextArea}>Descrição</Label>
             <TextArea
                 value={description}
-                onChangeValue={setDescription}
+                onChangeValue={(value) => formatAndSetValue(value, setDescription)}
                 placeholder={`Descrição sobre esta ${type.includes('SPENDING') ? 'despesa' : 'renda'}`}
             />
 
@@ -178,6 +185,8 @@ const styles = StyleSheet.create({
             borderRadius: 20,
             maxWidth: ScreenWidth * 0.25,
             minWidth: ScreenWidth * 0.25,
+            minHeight: ScreenHeight * 0.06,
+            maxHeight: ScreenHeight * 0.06,
             backgroundColor: type === origin ? Colors.blue : Colors.white,
         }
     },

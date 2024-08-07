@@ -31,7 +31,7 @@ class Users extends CRUD {
 
             const tokenIsExpired = new Date(user?.tokenExpiresAt || new Date()) > new Date()
 
-            return tokenIsExpired
+            return { firstNameUser: user.name, tokenIsExpired }
 
         } catch (e) {
             console.error('Erro ao verificar usuário logado', e)

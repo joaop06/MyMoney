@@ -73,12 +73,15 @@ const Loading = () => {
             }
 
             const { success, user } = await Users.login(username, password)
-            setNameUser(user?.name || '')
+            setNameUser(user?.name)
 
             if (success) {
-                setValue(true, setIsLoggedIn);
-                await MMKV.set('userId', user.id);
-                await MMKV.set('lastLoggedInUser', username);
+                setTimeout(async () => {
+                    setValue(true, setIsLoggedIn);
+                    await MMKV.set('userId', user.id);
+                    await MMKV.set('firstUserName', user.name);
+                    await MMKV.set('lastLoggedInUser', username);
+                }, 250)
 
             } else {
                 setValue(
@@ -96,9 +99,10 @@ const Loading = () => {
     useEffect(() => {
         (async () => {
             const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
-            const isLogged = await Users.verifyIsLoggedIn(lastLoggedInUser)
+            const { firstNameUser, tokenIsExpired: isLogged } = await Users.verifyIsLoggedIn(lastLoggedInUser)
 
             setValue(isLogged, setIsLoggedIn)
+            setValue(firstNameUser, setNameUser)
             return isLogged
         })()
     }, [])
@@ -122,8 +126,8 @@ const Loading = () => {
     return (
         <Container style={{ justifyContent: 'space-between' }}>
 
-            <Title style={{ marginTop: 50 }}>{!isLoggedIn ? 'Olá!' : `Olá, ${nameUser}!`}</Title>
-            <Text>{isLoggedIn ? 'Seja Bem-vindo!' : 'Bem-vindo de volta! Faça seu Login'}</Text>
+            <Title style={{ marginTop: 50 }}>{isLoggedIn && nameUser !== '' ? `Olá, ${nameUser}!` : 'Olá!'}</Title>
+            <Text>{isLoggedIn && nameUser !== '' ? 'Bem-vindo de volta! Faça seu Login' : 'Seja Bem-vindo!'}</Text>
 
             <Container style={styles.credentialContainer}>
                 {showCredentialEntry && (

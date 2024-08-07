@@ -28,6 +28,8 @@ const SignUp = () => {
     const [username, setUsername] = useState('');
 
     const setValue = (value, state, temporary = false, time = 3500) => {
+        if (typeof value === 'string') value = value.trim()
+
         state(value)
         if (temporary) {
             setTimeout(() => state(null), time)
@@ -65,19 +67,19 @@ const SignUp = () => {
                 <Input
                     label="Nome"
                     placeholder="Primeiro Nome"
-                    onChangeValue={setName}
+                    onChangeValue={(value) => setValue(value, setName)}
                     style={[styles.input.default, requestSignUp?.error && styles.input.error]}
                 />
                 <Input
                     label="Usuário"
-                    onChangeValue={setUsername}
+                    onChangeValue={(value) => setValue(value, setUsername)}
                     placeholder="Informe seu usuário"
                     style={[styles.input.default, requestSignUp?.error && styles.input.error]}
                 />
                 <Input
                     label="Senha"
                     secureTextEntry={true}
-                    onChangeValue={setPassword}
+                    onChangeValue={(value) => setValue(value, setPassword)}
                     placeholder="Digite sua senha"
                     style={[styles.input.default, requestSignUp?.error && styles.input.error]}
                 />

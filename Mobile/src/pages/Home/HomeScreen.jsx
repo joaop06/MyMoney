@@ -41,11 +41,22 @@ const { screen: Spending, name: NameSpending } = require('./Spending');
 const Home = (data) => {
     navigation = useNavigation();
     const totalBalance = data.route?.params?.totalBalance;
+    const [firstUserName, setFirstUserName] = useState('');
     const [isAlertVisible, setIsAlertVisible] = useState(false);
     const [balance, setBalance] = useState(totalBalance || 0.00);
 
+
+    const getName = async () => {
+        let firstName = await MMKV.find('firstUserName');
+        firstName = firstName.split(' ')
+        setFirstUserName(firstName[0])
+    }
+    getName()
+
     useEffect(() => {
         const interval = setInterval(async () => {
+            if (firstUserName == '') await getName()
+
             const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
             setBalance(userData.totalBalance)
         }, 500)
@@ -83,8 +94,12 @@ const Home = (data) => {
             {/* Confirmação de Logout */}
             <Alert isVisible={isAlertVisible} onCancel={hideAlert} onConfirm={handleConfirm} />
 
+            <Title style={styles.titles}>Finanças de {firstUserName}</Title>
 
-            <Title style={styles.balance}>Saldo {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title >
+            <Text style={{ fontSize: 20 }}>
+                Saldo
+                <Title style={styles.titles}> {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title>
+            </Text>
 
             <Tab.Navigator style={styles.containerTab} onStateChange={state => handleTabChange(state)}>
                 <Tab.Screen name={NameSpending} component={Spending} />
@@ -96,7 +111,7 @@ const Home = (data) => {
 }
 
 const styles = StyleSheet.create({
-    balance: {
+    titles: {
         fontSize: 24,
         marginTop: 25,
         marginBottom: 15,

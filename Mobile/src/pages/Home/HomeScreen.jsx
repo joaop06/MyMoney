@@ -6,7 +6,9 @@
  *  - Gráficos de entradas e saídas.
  *  - Alertas de gastos altos e de proximidade ao valor recebido no salário do mês.
  */
+import Users from '../../Data/Users';
 import MMKV from '../../utils/MMKV/MMKV';
+
 import { Components } from '../../utils/Stylization';
 import { StyleSheet, BackHandler } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -16,6 +18,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 /** Components */
+import Text from '../../components/Text';
 import Alert from '../../components/Alert';
 import Title from '../../components/Title';
 import Container from '../../components/Container';
@@ -37,15 +40,15 @@ const { screen: Spending, name: NameSpending } = require('./Spending');
 
 const Home = (data) => {
     navigation = useNavigation();
-    const [isAlertVisible, setIsAlertVisible] = useState(false);
-
     const totalBalance = data.route?.params?.totalBalance;
+    const [isAlertVisible, setIsAlertVisible] = useState(false);
     const [balance, setBalance] = useState(totalBalance || 0.00);
 
     useEffect(() => {
         const interval = setInterval(async () => {
-            setBalance(await MMKV.find('totalBalance'))
-        }, 3000)
+            const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
+            setBalance(userData.totalBalance)
+        }, 500)
 
         return () => clearInterval(interval)
     }, [])
@@ -56,7 +59,7 @@ const Home = (data) => {
 
     const handleConfirm = async () => {
         hideAlert();
-        await MMKV.set('isLoggedIn', false);
+        await MMKV.set('lastLoggedInUser', '');
         navigation.reset({
             index: 0,
             routes: [{ name: 'Loading' }]
@@ -81,7 +84,7 @@ const Home = (data) => {
             <Alert isVisible={isAlertVisible} onCancel={hideAlert} onConfirm={handleConfirm} />
 
 
-            <Title style={styles.balance}>Saldo  {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title >
+            <Title style={styles.balance}>Saldo {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title >
 
             <Tab.Navigator style={styles.containerTab} onStateChange={state => handleTabChange(state)}>
                 <Tab.Screen name={NameSpending} component={Spending} />
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
     balance: {
         fontSize: 24,
         marginTop: 25,
-        marginBottom: 25,
+        marginBottom: 15,
         fontWeight: 'bold',
     },
     containerTab: {
@@ -105,4 +108,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default { name: 'Início', screen: Home, config };
+export default { name: 'HomeScreen', screen: Home, config };

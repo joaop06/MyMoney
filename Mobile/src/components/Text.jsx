@@ -2,8 +2,12 @@ import React from 'react';
 import { Colors } from '../utils/Stylization';
 import { Text as TextNative, StyleSheet } from 'react-native';
 
-const Text = ({ children, style = {} }) => {
-    return <TextNative style={{ ...styles.text, ...style }}>{children}</TextNative>;
+const Text = ({
+    children,
+    style = {},
+    onPress = () => { }
+}) => {
+    return <TextNative style={{ ...styles.text, ...style }} onPress={onPress}>{children}</TextNative>;
 };
 
 const styles = StyleSheet.create({

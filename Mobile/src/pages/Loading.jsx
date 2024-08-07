@@ -5,7 +5,9 @@
  *  - Opções de login via e-mail/senha, Google ou Facebook.
  * 
 */
+import Users from '../Data/Users';
 import MMKV from '../utils/MMKV/MMKV';
+
 import { StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Colors } from '../utils/Stylization';
@@ -36,6 +38,7 @@ const Loading = () => {
 
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [nameUser, setNameUser] = useState('')
 
 
     const setValue = (value, state, temporary = false, time = 2500) => {
@@ -49,22 +52,33 @@ const Loading = () => {
         if (actionButtonName === 'Acessar') {
             if (isLoggedIn) {
                 navigation.navigate('Main');
+
             } else {
-                setValue('Entrar', setActionButtonName)
                 setValue(true, setShowCredentialEntry)
+                setValue('Entrar', setActionButtonName)
             }
 
         } else if (actionButtonName === 'Entrar') {
 
             /** 
              * Simulação aleatória de erro
-             * 
              * Aqui ficará a Requisição de Login
              */
-            const sortNumError = Math.floor(Math.random() * 4) + 1
-            if (sortNumError !== 1) {
-                await MMKV.set('isLoggedIn', true);
-                setValue(true, setIsLoggedIn)
+            if (!username || !password) {
+                return setValue(
+                    { error: true, message: 'Preencha os campos corretamente' },
+                    setRequestLogin,
+                    true
+                )
+            }
+
+            const { success, user } = await Users.login(username, password)
+            setNameUser(user?.name || '')
+
+            if (success) {
+                setValue(true, setIsLoggedIn);
+                await MMKV.set('userId', user.id);
+                await MMKV.set('lastLoggedInUser', username);
 
             } else {
                 setValue(
@@ -81,7 +95,9 @@ const Loading = () => {
     useEffect(() => { }, [verifyingSession])
     useEffect(() => {
         (async () => {
-            const isLogged = await MMKV.find('isLoggedIn')
+            const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
+            const isLogged = await Users.verifyIsLoggedIn(lastLoggedInUser)
+
             setValue(isLogged, setIsLoggedIn)
             return isLogged
         })()
@@ -94,7 +110,9 @@ const Loading = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setValue(false, setVerifyingSession);
-            if (isLoggedIn && actionButtonName !== 'Acessar') navigation.navigate('Main');
+            if (isLoggedIn && actionButtonName !== 'Acessar') {
+                navigation.navigate('Main');
+            }
         }, 500);
 
         return () => clearTimeout(timer);
@@ -104,7 +122,7 @@ const Loading = () => {
     return (
         <Container style={{ justifyContent: 'space-between' }}>
 
-            <Title style={{ marginTop: 50 }}>Olá, {'João'}!</Title>
+            <Title style={{ marginTop: 50 }}>{!isLoggedIn ? 'Olá!' : `Olá, ${nameUser}!`}</Title>
             <Text>{isLoggedIn ? 'Seja Bem-vindo!' : 'Bem-vindo de volta! Faça seu Login'}</Text>
 
             <Container style={styles.credentialContainer}>
@@ -129,6 +147,8 @@ const Loading = () => {
                         >
                             {requestLogin?.message || ''}
                         </Text>
+
+                        <Text style={{ fontSize: 14 }}>Ainda não possui conta? <Text onPress={() => navigation.navigate('SignUp')} style={{ color: Colors.blue, fontSize: 14 }}>Cadastre-se</Text></Text>
                     </>
                 )}
 

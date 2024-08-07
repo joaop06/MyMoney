@@ -67,7 +67,9 @@ const NewReleases = ({ route }) => {
     }
 
     const handleNewRelease = async () => {
-        const parsedValue = parseFloat(value) || 0.00;
+        formatAndSetValue(title, setTitle);
+        formatAndSetValue(description, setDescription);
+        const parsedValue = parseFloat(value.replace(',', '.') || 0.00;
 
         // Tratativa de campos vazios para inserção
         if (parsedValue <= 0.00 || !title) {
@@ -112,10 +114,10 @@ const NewReleases = ({ route }) => {
             <Input
                 value={value}
                 label="Valor *"
-                inputMode="decimal-pad"
+                inputMode="decimal"
                 style={styles.valueRelease}
                 placeholder="Ex: R$ 100,00"
-                onChangeValue={(value) => formatAndSetValue(value, setValue)}
+                onChangeValue={setValue}
             />
 
             <Container style={styles.containerSelector}>
@@ -136,7 +138,7 @@ const NewReleases = ({ route }) => {
             <Input
                 value={title}
                 label="Título *"
-                onChangeValue={(value) => formatAndSetValue(value, setTitle)}
+                onChangeValue={setTitle}
                 style={styles.titleRelease}
                 placeholder="Título do lançamento"
             />
@@ -144,7 +146,7 @@ const NewReleases = ({ route }) => {
             <Label style={styles.labelTextArea}>Descrição</Label>
             <TextArea
                 value={description}
-                onChangeValue={(value) => formatAndSetValue(value, setDescription)}
+                onChangeValue={setDescription}
                 placeholder={`Descrição sobre esta ${type.includes('SPENDING') ? 'despesa' : 'renda'}`}
             />
 

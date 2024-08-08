@@ -53,9 +53,9 @@ class Users extends CRUD {
 
             success = true
             return { success, user }
+        } else {
+            throw new Error('Usuário não encontrado')
         }
-
-        return { success }
     }
 
     async updateTotalBalance(userId) {

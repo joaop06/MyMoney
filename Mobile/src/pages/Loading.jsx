@@ -72,20 +72,29 @@ const Loading = () => {
                 )
             }
 
-            const { success, user } = await Users.login(username, password)
-            setNameUser(user?.name)
+            try {
+                const { success, user } = await Users.login(username, password)
 
-            if (success) {
-                setTimeout(async () => {
-                    setValue(true, setIsLoggedIn);
-                    await MMKV.set('userId', user.id);
-                    await MMKV.set('firstUserName', user.name);
-                    await MMKV.set('lastLoggedInUser', username);
-                }, 250)
+                setNameUser(user?.name)
 
-            } else {
+                if (success) {
+                    setTimeout(async () => {
+                        setValue(true, setIsLoggedIn);
+                        await MMKV.set('userId', user.id);
+                        await MMKV.set('firstUserName', user.name);
+                        await MMKV.set('lastLoggedInUser', username);
+                    }, 250)
+
+                } else {
+                    setValue(
+                        { error: true, message: 'Usuário e/ou Senha incorretos' },
+                        setRequestLogin,
+                        true
+                    )
+                }
+            } catch (e) {
                 setValue(
-                    { error: true, message: 'Usuário e/ou Senha incorretos' },
+                    { error: true, message: e.message },
                     setRequestLogin,
                     true
                 )

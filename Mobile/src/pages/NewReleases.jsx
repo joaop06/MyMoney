@@ -10,10 +10,10 @@ import MMKV from "../utils/MMKV/MMKV";
 import Releases from "../Data/Releases";
 
 import { StyleSheet } from 'react-native';
-import { useState, useEffect } from "react";
-import { useNavigation } from '@react-navigation/native';
+import { useState, useEffect, useCallback } from "react";
 import { Colors, Components } from "../utils/Stylization";
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -23,6 +23,7 @@ import Title from "../components/Title";
 import Button from "../components/Button";
 import TextArea from "../components/TextArea";
 import Container from "../components/Container";
+import InputMask from "../components/InputMask";
 
 
 var navigation
@@ -37,39 +38,36 @@ const config = {
     />
 };
 
-const NewReleases = ({ route }) => {
+const NewReleases = () => {
     navigation = useNavigation();
-    const origin = route?.params?.origin;
 
     const [title, setTitle] = useState('');
     const [value, setValue] = useState(0.00);
+    const [type, setType] = useState('SPENDING');
     const [description, setDescription] = useState('');
-    const [type, setType] = useState((origin || 'SPENDING').toUpperCase());
 
     const optionsToSelect = [{ name: 'Despesas', origin: 'SPENDING' }, { name: 'Rendas', origin: 'RENTS' }]
 
     /*
      * Limpa os campos ao montar o componente ou ao mudar de tela
      */
-    useEffect(() => {
-        setTitle('');
-        setValue(0.00);
-        setDescription('');
-    }, [route, navigation]);
-
-    const formatAndSetValue = (value, state, temporary = false, time = 3500) => {
-        if (typeof value === 'string') value = value.trim()
-
-        state(value)
-        if (temporary) {
-            setTimeout(() => state(null), time)
-        }
-    }
+    useFocusEffect(
+        useCallback(() => {
+            setTitle('');
+            setValue(0.00);
+            setDescription('');
+            return
+        }, [])
+    );
 
     const handleNewRelease = async () => {
-        formatAndSetValue(title, setTitle);
-        formatAndSetValue(description, setDescription);
-        const parsedValue = parseFloat(value.replace(',', '.') || 0.00;
+        setTitle(title.trim());
+        setDescription(description.trim());
+
+        const parsedValue = parseFloat(
+            value.replace('R$ ', '').replaceAll('.', '').replace(',', '.')
+            || 0.00
+        );
 
         // Tratativa de campos vazios para inserção
         if (parsedValue <= 0.00 || !title) {
@@ -82,22 +80,22 @@ const NewReleases = ({ route }) => {
             const userId = await MMKV.find('userId');
 
             // Adiciona o Novo Lançamento
-            const newRelease = {
+            await Releases.create({
                 type,
                 title,
                 userId,
                 description,
                 value: parsedValue,
-            }
-            await Releases.create(newRelease)
+            })
 
 
             // Atualiza Saldo Total e Redireciona para tela inicial
             const totalBalance = await Users.updateTotalBalance(userId);
+            await setDescription('')
             navigation.navigate('HomeScreen', { totalBalance });
 
         } catch (e) {
-            console.error("Erro ao adicionar lançamento:", error);
+            console.error("Erro ao adicionar lançamento:", e);
             // Implementar Modal de Alerta: Ex: Alert.alert('Erro', 'Não foi possível adicionar o lançamento.');
         }
     }
@@ -109,15 +107,22 @@ const NewReleases = ({ route }) => {
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={styles.container}
         >
-            <Title>Novo Lançamento</Title>
+            <Title>Lançamento de {`${type.includes('SPENDING') ? 'Despesa' : 'Renda'}`}</Title>
 
-            <Input
+            <InputMask
+                type="money"
                 value={value}
                 label="Valor *"
                 inputMode="decimal"
+                onChangeValue={setValue}
                 style={styles.valueRelease}
                 placeholder="Ex: R$ 100,00"
-                onChangeValue={setValue}
+                options={{
+                    unit: 'R$ ',
+                    precision: 2,
+                    separator: ',',
+                    suffixUnit: '',
+                }}
             />
 
             <Container style={styles.containerSelector}>
@@ -171,8 +176,7 @@ const styles = StyleSheet.create({
     valueRelease: {
         marginTop: 20,
         borderRadius: 10,
-        width: ScreenWidth * 0.4,
-        backgroundColor: Colors.transparent,
+        width: ScreenWidth * 0.5,
     },
     containerSelector: {
         marginTop: 50,

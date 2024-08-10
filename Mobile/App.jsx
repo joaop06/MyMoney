@@ -11,10 +11,11 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SignUp from './src/pages/SignUp.jsx';
 import Loading from './src/pages/Loading.jsx';
 import Categories from './src/pages/Categories.jsx';
-import EditRelease from './src/pages/EditRelease.jsx';
 import NewReleases from './src/pages/NewReleases.jsx';
 import HomeScreen from './src/pages/Home/HomeScreen.jsx';
+import EditRelease from './src/pages/Home/EditRelease.jsx';
 import MonthEndClosing from './src/pages/MonthEndClosing.jsx';
+import ReleasesGrouped from './src/pages/Home/ReleasesGrouped.jsx';
 
 
 import MMKV from './src/utils/MMKV/MMKV.jsx';
@@ -53,6 +54,7 @@ function App() {
         {newStackScreen('Main', MyTabs, { headerShown: false })}
         {newStackScreen(SignUp.name, SignUp.screen, SignUp.config)}
         {newStackScreen(EditRelease.name, EditRelease.screen, EditRelease.config)}
+        {newStackScreen(ReleasesGrouped.name, ReleasesGrouped.screen, ReleasesGrouped.config)}
       </Stack.Navigator>
     </NavigationContainer>
   )

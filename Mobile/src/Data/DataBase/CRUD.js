@@ -55,9 +55,10 @@ export default class CRUD extends SQLite {
         const objectAttributes = Object.keys(object)
         const fieldsToCreate = this.treatTableAttrsOnSql(object, { joinWith: ',', onlyValue: true })
 
+        const now = new Date().toISOString()
         return await super.executeQuery(`
-            INSERT INTO ${this.tableName} (${objectAttributes})
-            VALUES (${fieldsToCreate})
+            INSERT INTO ${this.tableName} (${objectAttributes},createdAt,updatedAt)
+            VALUES (${fieldsToCreate},'${now}','${now}')
         `)
     }
 

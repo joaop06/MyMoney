@@ -1,6 +1,3 @@
-import Text from './Text';
-import Title from './Title';
-import Button from './Button';
 import { Colors } from '../utils/Stylization';
 import { FlatList, StyleSheet } from 'react-native';
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions'

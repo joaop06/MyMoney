@@ -5,9 +5,20 @@ import { Text as TextNative, StyleSheet } from 'react-native';
 const Text = ({
     children,
     style = {},
-    onPress = () => { }
+    numberOfLines = 0,
+    onPress = () => { },
+    ellipsizeMode = 'tail',
 }) => {
-    return <TextNative style={{ ...styles.text, ...style }} onPress={onPress}>{children}</TextNative>;
+    return (
+        <TextNative
+            onPress={onPress}
+            numberOfLines={numberOfLines}
+            ellipsizeMode={ellipsizeMode}
+            style={{ ...styles.text, ...style }}
+        >
+            {children}
+        </TextNative>
+    )
 };
 
 const styles = StyleSheet.create({

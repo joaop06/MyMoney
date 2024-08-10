@@ -91,7 +91,6 @@ const NewReleases = () => {
 
             // Atualiza Saldo Total e Redireciona para tela inicial
             const totalBalance = await Users.updateTotalBalance(userId);
-            await setDescription('')
             navigation.navigate('HomeScreen', { totalBalance });
 
         } catch (e) {
@@ -172,6 +171,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         maxHeight: ScreenHeight * 1.1,
         justifyContent: 'space-between',
+        backgroundColor: Colors.transparent,
     },
     valueRelease: {
         marginTop: 20,

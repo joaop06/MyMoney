@@ -8,13 +8,6 @@
 import Users from "../../Data/Users";
 import Releases from "../../Data/Releases";
 
-import { StyleSheet } from 'react-native';
-import { useState, useEffect } from "react";
-import { Colors } from '../../utils/Stylization';
-import { useNavigation } from '@react-navigation/native';
-import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-
 import Alert from "../../components/Alert";
 import Input from "../../components/Input";
 import Label from "../../components/Label";
@@ -24,6 +17,13 @@ import TextArea from "../../components/TextArea";
 import Container from "../../components/Container";
 import InputMask from "../../components/InputMask";
 
+import { StyleSheet } from 'react-native';
+import { useState, useEffect } from "react";
+import { Colors } from '../../utils/Stylization';
+import { useNavigation } from '@react-navigation/native';
+import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+
 
 const config = { headerShown: false };
 
@@ -31,13 +31,11 @@ const EditRelease = ({ route }) => {
     const navigation = useNavigation();
     const [editable, setEditable] = useState(false);
 
-    const [newReleaseData, setNewReleaseData] = useState({});
     const [hasBeenChange, setHasBeenChange] = useState(false);
-    const [releaseData, setReleaseData] = useState(route?.params);
+    const [releaseData, setReleaseData] = useState({ ...route?.params });
+    const [newReleaseData, setNewReleaseData] = useState({ ...route?.params });
 
     const optionsToSelect = [{ name: 'Despesas', origin: 'SPENDING' }, { name: 'Rendas', origin: 'RENTS' }]
-
-    console.log('releaseData (Edição): ', releaseData)
 
     const showAlertDelete = () => setIsAlertDeleteVisible(true);
     const hideAlertDelete = () => setIsAlertDeleteVisible(false);
@@ -49,7 +47,6 @@ const EditRelease = ({ route }) => {
             for (let key in releaseData) {
                 if (newReleaseData.hasOwnProperty(key)) {
                     if (releaseData[key] !== newReleaseData[key]) {
-                        console.log('Teve alteração de valores')
                         return setHasBeenChange(true); // Se algum valor não for igual (houver alteração)
                     }
                 }
@@ -70,9 +67,35 @@ const EditRelease = ({ route }) => {
     }
 
     const handleEditRelease = async () => {
-        console.log('Salvou o Lançamento')
+        let totalBalance
+        if (hasBeenChange) {
 
-        setTimeout(() => navigation.navigate('HomeScreen'), 500);
+            const parsedValue = parseFloat(
+                newReleaseData.value.replace('R$ ', '').replaceAll('.', '').replace(',', '.')
+                || 0.00
+            );
+
+            const releaseToUpdate = {
+                value: parsedValue,
+                id: newReleaseData.id,
+                type: newReleaseData.type,
+                userId: newReleaseData.userId,
+                title: newReleaseData.title.trim(),
+                description: newReleaseData.description.trim(),
+            }
+
+            console.log('Teve alteração na edição!')
+            console.log(`releaseData: ${JSON.stringify(releaseData)} // newReleaseData: ${JSON.stringify(releaseToUpdate)}`)
+            await Releases.update(releaseToUpdate, { id: releaseToUpdate.id })
+
+            // Atualiza Saldo Total e Redireciona para tela inicial
+            totalBalance = await Users.updateTotalBalance(newReleaseData.userId);
+
+        } else {
+            console.log('Não teve alteração')
+        }
+
+        navigation.navigate('HomeScreen', { totalBalance });
     }
 
     return (
@@ -104,8 +127,8 @@ const EditRelease = ({ route }) => {
                             disabled={!editable}
                             onPress={() => setValueOnNewReleaseData('type', option.origin)}
                             style={{
-                                button: styles.buttonTypeRelease(releaseData.type, option.origin),
-                                text: styles.buttonTypeTextRelease(releaseData.type, option.origin)
+                                button: styles.buttonTypeRelease(newReleaseData.type, option.origin),
+                                text: styles.buttonTypeTextRelease(newReleaseData.type, option.origin)
                             }}
                         >
                             {option.name}
@@ -118,9 +141,9 @@ const EditRelease = ({ route }) => {
                     label="Valor *"
                     editable={editable}
                     inputMode="decimal"
-                    value={releaseData.value}
                     placeholder="Ex: R$ 100,00"
                     style={styles.valueRelease}
+                    value={newReleaseData.value}
                     onChangeValue={(value) => setValueOnNewReleaseData('value', value)}
                     options={{
                         unit: 'R$ ',
@@ -133,7 +156,8 @@ const EditRelease = ({ route }) => {
                 <Input
                     label="Título *"
                     disabled={!editable}
-                    value={releaseData.title}
+                    style={styles.titleRelease}
+                    value={newReleaseData.title}
                     placeholder="Título do lançamento"
                     onChangeValue={(title) => setValueOnNewReleaseData('title', title)}
                 />
@@ -142,7 +166,7 @@ const EditRelease = ({ route }) => {
                 <TextArea
                     editable={editable}
                     disabled={!editable}
-                    value={releaseData.description}
+                    value={newReleaseData.description}
                     onChangeValue={(description) => setValueOnNewReleaseData('description', description)}
                     placeholder={`Descrição sobre esta ${releaseData.type.includes('SPENDING') ? 'despesa' : 'renda'}`}
                 />
@@ -163,7 +187,7 @@ const EditRelease = ({ route }) => {
 
 const styles = StyleSheet.create({
     container: {
-        alignItems: 'flex-start',
+        alignItems: 'center',
         maxHeight: ScreenHeight * 0.9,
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
@@ -178,7 +202,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         maxHeight: ScreenHeight * 0.1,
-        backgroundColor: Colors.grey_lighten,
+        backgroundColor: Colors.transparent,
     },
     buttonTypeRelease: (type, origin) => {
         return {
@@ -206,10 +230,14 @@ const styles = StyleSheet.create({
             color: editable ? Colors.blue : Colors.grey,
         }
     },
+    titleRelease: {
+        width: ScreenWidth * 0.7,
+    },
     containerButtons: {
         flexDirection: 'row',
         justifyContent: 'center',
         maxHeight: ScreenHeight * 0.1,
+        backgroundColor: Colors.transparent,
     },
     actionsButton: (type) => {
         return {

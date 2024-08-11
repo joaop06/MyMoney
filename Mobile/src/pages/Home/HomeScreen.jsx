@@ -45,7 +45,6 @@ const Home = (data) => {
     const [isAlertVisible, setIsAlertVisible] = useState(false);
     const [balance, setBalance] = useState(totalBalance || 0.00);
 
-
     const getName = async () => {
         let firstName = await MMKV.find('firstUserName');
         firstName = firstName.split(' ')

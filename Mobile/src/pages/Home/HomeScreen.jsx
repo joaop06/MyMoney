@@ -92,7 +92,12 @@ const Home = (data) => {
     return (
         <Container>
             {/* Confirmação de Logout */}
-            <Alert isVisible={isAlertVisible} onCancel={hideAlert} onConfirm={handleConfirm} />
+            <Alert
+                onCancel={hideAlert}
+                onConfirm={handleConfirm}
+                isVisible={isAlertVisible}
+                content={{ title: 'Deseja Sair?', cancel: 'Cancelar', confirm: 'Sair' }}
+            />
 
             <Title style={styles.titles}>Finanças de {firstUserName}</Title>
 

@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
             height: ScreenHeight * 0.07,
             opacity: editable ? 1 : 0.5,
             backgroundColor: Colors.grey_lighten,
-            borderBottomWidth: isFocused ? 2 : 0.5,
+            borderBottomWidth: isFocused ? 1.5 : 0.5,
             borderBottomColor: isFocused ? Colors.blue : Colors.grey_darken,
         }
     },

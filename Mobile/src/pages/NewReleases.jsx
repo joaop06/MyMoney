@@ -161,7 +161,7 @@ const NewReleases = () => {
             >
                 Adicionar
             </Button>
-        </KeyboardAwareScrollView >
+        </KeyboardAwareScrollView>
     )
 }
 

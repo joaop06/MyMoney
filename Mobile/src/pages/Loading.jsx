@@ -143,6 +143,7 @@ const Loading = () => {
                     <>
                         <Input
                             label="Usuário"
+                            autoCapitalize={'none'}
                             placeholder="Digite seu usuário"
                             onChangeValue={(value) => setValue(value, setUsername)}
                             style={[styles.input.default, requestLogin?.error && styles.input.error]}
@@ -150,6 +151,7 @@ const Loading = () => {
                         <Input
                             label="Senha"
                             secureTextEntry={true}
+                            autoCapitalize={'none'}
                             placeholder="Digite sua senha"
                             onChangeValue={(value) => setValue(value, setPassword)}
                             style={[styles.input.default, requestLogin?.error && styles.input.error]}

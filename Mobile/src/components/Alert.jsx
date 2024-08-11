@@ -7,24 +7,28 @@ import { StyleSheet } from "react-native";
 import { Colors } from '../utils/Stylization';
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 
-const Alert = ({ isVisible, onCancel, onConfirm, stylization }) => {
-
-    stylization
+const Alert = ({
+    onCancel,
+    onConfirm,
+    isVisible = false,
+    content = { title: '', cancel: '', confirm: '' },
+}) => {
+    const { title, cancel, confirm } = content
 
     return (
         <Modal isVisible={isVisible}>
             <Container style={styles.container}>
 
-                <Text style={styles.title}>Deseja Sair?</Text>
+                <Text style={styles.title}>{title}</Text>
 
                 <Container style={styles.buttonContainer}>
 
                     <Button onPress={onCancel} style={{ button: styles.button, text: styles.cancelButtonText }} >
-                        Cancelar
+                        {cancel}
                     </Button>
 
                     <Button onPress={onConfirm} style={{ button: styles.button, text: styles.confirmButtonText }} >
-                        Sair
+                        {confirm}
                     </Button>
 
                 </Container>

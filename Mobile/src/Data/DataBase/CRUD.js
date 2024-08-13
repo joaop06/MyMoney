@@ -67,12 +67,6 @@ export default class CRUD extends SQLite {
         const fieldsToUpdate = this.treatTableAttrsOnSql(object, { joinWith: ',' })
         if (fieldsToUpdate === '') return
 
-        console.log(`
-            UPDATE ${this.tableName}
-            SET ${fieldsToUpdate}, updatedAt = '${new Date().toISOString()}'
-            WHERE ${whereClause}
-        `)
-
         return await super.executeQuery(`
             UPDATE ${this.tableName}
             SET ${fieldsToUpdate}, updatedAt = '${new Date().toISOString()}'

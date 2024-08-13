@@ -56,6 +56,7 @@ const EditRelease = ({ route }) => {
     }, [newReleaseData])
 
     const setValueOnNewReleaseData = (property, value) => {
+        console.log(`Alteração em "${property}": ${value}`)
         setNewReleaseData({ ...newReleaseData, [property]: value })
     }
 
@@ -70,10 +71,9 @@ const EditRelease = ({ route }) => {
         let totalBalance
         if (hasBeenChange) {
 
-            const parsedValue = parseFloat(
-                newReleaseData.value.replace('R$ ', '').replaceAll('.', '').replace(',', '.')
-                || 0.00
-            );
+            let parsedValue
+            if (typeof newReleaseData.value === 'number') parsedValue = newReleaseData.value
+            else parsedValue = parseFloat(newReleaseData.value.replace('R$ ', '').replaceAll('.', '').replace(',', '.') || 0.00);
 
             const releaseToUpdate = {
                 value: parsedValue,
@@ -165,7 +165,7 @@ const EditRelease = ({ route }) => {
                 <Label style={styles.labelTextArea(editable)}>Descrição</Label>
                 <TextArea
                     editable={editable}
-                    disabled={!editable}
+                    style={{ marginTop: -50 }}
                     value={newReleaseData.description}
                     onChangeValue={(description) => setValueOnNewReleaseData('description', description)}
                     placeholder={`Descrição sobre esta ${releaseData.type.includes('SPENDING') ? 'despesa' : 'renda'}`}
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     },
     title: {
         marginTop: 30,
-        marginBottom: 60,
+        marginBottom: 20,
         textAlign: 'center',
         width: ScreenWidth * 0.96,
     },
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     },
     labelTextArea: (editable) => {
         return {
-            marginTop: 30,
+            marginTop: 10,
             color: editable ? Colors.blue : Colors.grey,
         }
     },

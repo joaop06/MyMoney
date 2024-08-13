@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     list: {
         width: ScreenWidth * 0.9,
         minHeight: ScreenHeight * 0.6,
+        maxHeight: ScreenHeight * 0.85,
         backgroundColor: Colors.transparent,
     },
 });

@@ -26,6 +26,7 @@ import Container from '../../components/Container';
 
 var navigation
 const config = {
+    title: 'Início',
     headerShown: false,
     tabBarIcon: () => <MaterialCommunityIcons
         name="home"

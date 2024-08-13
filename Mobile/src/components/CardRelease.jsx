@@ -8,8 +8,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const CardRelease = ({ item, navigateTo }) => {
 
-    const { prefix = 'icon', title, value } = item
-    const typeRelease = navigateTo.data.type === 'Despesas'
+    const { prefix = 'icon', iconName, title, value } = item
 
     return (
         <Button style={{ button: styles.button }} navigateTo={navigateTo} >
@@ -21,13 +20,16 @@ const CardRelease = ({ item, navigateTo }) => {
                     <MaterialCommunityIcons
                         size={25}
                         color={Colors.white}
-                        name={typeRelease ? 'elevation-rise' : 'elevation-decline'}
+                        name={iconName}
                     />
                 }
             </Container>
 
             <Container style={styles.containerText}>
-                <Text style={styles.title}>{title}</Text>
+                <Container style={{ ...styles.containerText, flexDirection: 'column', alignItems: 'flex-start' }}>
+                    <Text style={styles.title}>{title}</Text>
+                    <Text style={styles.category}>{'Categoria'}</Text>
+                </Container>
 
                 <Text style={styles.prefixAndSulfix}>
                     {value.toFixed(2).replace('.', ',')}
@@ -67,6 +69,11 @@ const styles = StyleSheet.create({
         marginBottom: 0,
         alignContent: 'center',
         color: Colors.grey_darken,
+    },
+    category: {
+        fontSize: 12,
+        marginTop: 2,
+        color: Colors.grey_lighten,
     },
 })
 

@@ -7,13 +7,11 @@ import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 const TextArea = ({
     value,
     label,
-    disabled,
+    style = {},
     placeholder,
     onChangeValue,
-    numberOfLines = 10,
-
-
     editable = true,
+    numberOfLines = 10,
     placeholderColor = Colors.grey,
 }) => {
     const [isFocused, setIsFocused] = useState(false)
@@ -30,7 +28,7 @@ const TextArea = ({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholderTextColor={placeholderColor}
-            style={styles.textArea(editable, isFocused)}
+            style={[styles.textArea(editable, isFocused), style]}
         />
         // <Input
         //     label={label}
@@ -48,7 +46,6 @@ const TextArea = ({
 
 const styles = StyleSheet.create({
     textArea: (editable, isFocused) => {
-
         return {
             marginBottom: 5,
             paddingLeft: 15,

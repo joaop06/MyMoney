@@ -2,8 +2,9 @@ import List from '../../components/List';
 import Text from '../../components/Text';
 import { StyleSheet } from "react-native";
 import Title from '../../components/Title';
+import { Colors } from '../../utils/Stylization';
 import Container from '../../components/Container';
-import { ScreenWidth } from '../../utils/Dimensions';
+import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 import CardRelease from '../../components/CardRelease';
 
 
@@ -11,15 +12,17 @@ const config = { headerShown: false };
 
 const ReleasesGrouped = ({ route: { params } }) => {
     let { date, dataList, totalValue, type } = params
+    // const iconName = type === 'Despesas' ? 'elevation-decline' : 'finance'
+    const iconName = type === 'Despesas' ? 'currency-usd-off' : 'currency-usd'
 
     totalValue = totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
     const renderItem = ({ item }) => (
-        <CardRelease item={item} navigateTo={{ name: 'EditRelease', data: item }} />
+        <CardRelease item={{ ...item, iconName }} navigateTo={{ name: 'EditRelease', data: item }} />
     )
 
     return (
-        <Container>
+        <Container style={styles.container}>
             <Container style={styles.title}>
                 <Title style={{ fontSize: 20 }}>{type} {date}:</Title>
 
@@ -29,6 +32,7 @@ const ReleasesGrouped = ({ route: { params } }) => {
 
             <List
                 data={dataList}
+                style={styles.list}
                 renderItem={renderItem}
             />
         </Container>
@@ -36,14 +40,19 @@ const ReleasesGrouped = ({ route: { params } }) => {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        justifyContent: 'space-between'
+    },
     title: {
+        marginBottom: 30,
         flexDirection: 'row',
         width: ScreenWidth * 0.7,
         justifyContent: 'space-between',
-        // fontSize: 15,
-        // marginBottom: 0,
-        // alignContent: 'center',
-        // color: Colors.grey_darken,
+    },
+    list: {
+        marginBottom: 50,
+        maxHeight: ScreenHeight * 0.7,
+
     },
 })
 

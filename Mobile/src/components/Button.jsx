@@ -1,6 +1,6 @@
 import React from 'react';
 import { Colors } from '../utils/Stylization';
-import { ScreenHeight } from '../utils/Dimensions';
+import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
@@ -36,19 +36,19 @@ const Button = ({
 const stylesDefault = StyleSheet.create({
     button: (disabled) => {
         return {
-            margin: 5,
             padding: 15,
-            borderRadius: 10,
             alignItems: 'center',
+            margin: ScreenWidth * 0.02,
             opacity: disabled ? 0.4 : 1,
             backgroundColor: Colors.blue,
             minHeight: ScreenHeight * 0.06,
+            borderRadius: ScreenWidth * 0.03,
         }
     },
     buttonText: {
-        fontSize: 18,
         fontWeight: 'bold',
         color: Colors.white,
+        fontSize: ScreenWidth * 0.045,
     },
 });
 

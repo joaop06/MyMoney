@@ -20,7 +20,8 @@ const Input = ({
     autoCapitalize = 'sentences',   // 'none': Nenhuma capitalização | 'sentences': Primeira letra de cada sentença | 'words': Primeira letra de cada palavra | 'characters': Todas as letras | undefined;
     placeholderColor = Colors.grey,
 }) => {
-    const [isFocused, setIsFocused] = useState(false)
+    const [isFocused, setIsFocused] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <TextInput
@@ -35,19 +36,27 @@ const Input = ({
             onChangeText={onChangeValue}
             numberOfLines={numberOfLines}
             autoCapitalize={autoCapitalize}
-            secureTextEntry={secureTextEntry}
             onBlur={() => setIsFocused(false)}
             onFocus={() => setIsFocused(true)}
             placeholderTextColor={placeholderColor}
             theme={{ colors: { primary: Colors.blue } }}
+            secureTextEntry={secureTextEntry && !showPassword}
             style={[styles.input(disabled, isFocused), style]}
+            right={secureTextEntry ? (
+                <TextInput.Icon
+                    color={Colors.grey_lighten_1}
+                    rippleColor={Colors.blue_lighten_2}
+                    icon={showPassword ? "eye-off" : "eye"}
+                    onPress={() => setShowPassword(!showPassword)}
+                />
+            ) : null}
+
         />
     );
 };
 
 const styles = StyleSheet.create({
     input: (disabled, isFocused) => {
-
         return {
             marginBottom: 5,
             borderRadius: 10,

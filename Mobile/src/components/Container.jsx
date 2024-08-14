@@ -10,11 +10,12 @@ const Container = ({ children, style = {} }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 10,
         width: ScreenWidth,
         alignItems: 'center',
         height: ScreenHeight,
-        backgroundColor: Colors.grey_lighten,
+        justifyContent: 'center',
+        padding: ScreenWidth * 0.01,
+        backgroundColor: Colors.grey_lighten_2,
     },
 });
 

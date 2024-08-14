@@ -88,6 +88,31 @@ module.exports = {
                     defaultValue: new Date().toISOString()
                 },
             }
+        },
+        {
+            name: 'Categories',
+            attributes: {
+                id: {
+                    type: 'INTEGER',
+                    allowNull: false,
+                    primaryKey: true,
+                    autoIncrement: true,
+                },
+                name: {
+                    type: 'TEXT',
+                    allowNull: false,
+                },
+                createdAt: {
+                    allowNull: true,
+                    type: 'DATETIME',
+                    defaultValue: new Date().toISOString()
+                },
+                updatedAt: {
+                    allowNull: true,
+                    type: 'DATETIME',
+                    defaultValue: new Date().toISOString()
+                },
+            }
         }
     ]
 }

@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 const config = {
     title: 'Cadastro',
     headerTitleStyle: { color: Colors.blue },
-    headerStyle: { backgroundColor: Colors.grey_lighten }
+    headerStyle: { backgroundColor: Colors.grey_lighten_2 }
 };
 
 
@@ -72,8 +72,9 @@ const SignUp = () => {
                 />
                 <Input
                     label="Usuário"
-                    onChangeValue={(value) => setValue(value, setUsername)}
+                    autoCapitalize="none"
                     placeholder="Informe seu usuário"
+                    onChangeValue={(value) => setValue(value, setUsername)}
                     style={[styles.input.default, requestSignUp?.error && styles.input.error]}
                 />
                 <Input

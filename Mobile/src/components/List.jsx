@@ -1,28 +1,31 @@
 import { Colors } from '../utils/Stylization';
-import { FlatList, StyleSheet } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions'
 
 const List = ({
     data = [],
     style = {},
-    renderItem = () => { }
+    renderItem = () => { },
+    listEmptyComponent = () => null
 }) => {
     return (
         <FlatList
             data={data}
-            style={[styles.list, style]}
             renderItem={renderItem}
+            style={[styles.list, style]}
             keyExtractor={item => item.id}
+            ListEmptyComponent={listEmptyComponent}
         />
     );
 };
 
 const styles = StyleSheet.create({
     list: {
+        borderRadius: 10,
         width: ScreenWidth * 0.9,
-        minHeight: ScreenHeight * 0.6,
-        maxHeight: ScreenHeight * 0.85,
-        backgroundColor: Colors.transparent,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        backgroundColor: Colors.grey_lighten_2,
     },
 });
 

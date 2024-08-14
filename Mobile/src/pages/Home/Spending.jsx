@@ -1,7 +1,10 @@
 import moment from 'moment';
 import MMKV from '../../utils/MMKV/MMKV';
+import { StyleSheet } from "react-native";
 import Releases from '../../Data/Releases';
 import { useEffect, useState } from 'react';
+import { Colors } from '../../utils/Stylization';
+import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 
 /** Components */
 import List from '../../components/List';
@@ -88,15 +91,32 @@ const Spending = () => {
     }
 
     return (
-        <Container>
-            <Text style={{ fontSize: 16 }}>Despesas Totais: {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+        <Container style={styles.container}>
+            <Text style={styles.total}>
+                Despesas Totais: {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </Text>
 
-            <List
-                data={dataSpending}
-                renderItem={renderItem}
-            />
+            <List style={styles.list} data={dataSpending} renderItem={renderItem} />
         </Container>
     )
 }
+
+const styles = StyleSheet.create({
+    container: {
+        elevation: 10,
+        margin: 'auto',
+        width: ScreenWidth,
+        maxHeight: ScreenHeight * 0.72,
+        backgroundColor: Colors.grey_lighten_2,
+    },
+    total: {
+        fontSize: ScreenWidth * 0.04,
+        marginTop: ScreenHeight * 0.01,
+    },
+    list: {
+        elevation: 1,
+        marginTop: ScreenHeight * -0.01,
+    },
+})
 
 module.exports = { name: 'Despesas', screen: Spending };

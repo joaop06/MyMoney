@@ -9,8 +9,8 @@ import Users from "../Data/Users";
 import MMKV from "../utils/MMKV/MMKV";
 import Releases from "../Data/Releases";
 
-import { StyleSheet } from 'react-native';
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { StyleSheet, ScrollView } from 'react-native';
 import { Colors, Components } from "../utils/Stylization";
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -101,120 +101,140 @@ const NewReleases = () => {
 
 
     return (
-        <KeyboardAwareScrollView
-            enableOnAndroid={true}
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={styles.container}
-        >
-            <Title>Lançamento de {`${type.includes('SPENDING') ? 'Despesa' : 'Renda'}`}</Title>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <Container style={styles.container}>
 
-            <InputMask
-                type="money"
-                value={value}
-                label="Valor *"
-                inputMode="decimal"
-                onChangeValue={setValue}
-                style={styles.valueRelease}
-                placeholder="Ex: R$ 100,00"
-                options={{
-                    unit: 'R$ ',
-                    precision: 2,
-                    separator: ',',
-                    suffixUnit: '',
-                }}
-            />
+                <Title style={styles.title}>
+                    Lançamento de {`${type.includes('SPENDING') ? 'Despesa' : 'Renda'}`}
+                </Title>
 
-            <Container style={styles.containerSelector}>
-                {optionsToSelect.map((option, index) => (
+                <Container style={styles.containerSelector}>
+                    {optionsToSelect.map((option, index) => (
+                        <Button
+                            key={index}
+                            style={{
+                                button: styles.containerButton(type, option.origin),
+                                text: styles.containerButtonText(type, option.origin)
+                            }}
+                            onPress={() => setType(option.origin)}
+                        >
+                            {option.name}
+                        </Button>
+                    ))}
+                </Container>
+
+                <InputMask
+                    type="money"
+                    value={value}
+                    label="Valor *"
+                    inputMode="decimal"
+                    onChangeValue={setValue}
+                    style={styles.valueRelease}
+                    placeholder="Ex: R$ 100,00"
+                    options={{
+                        unit: 'R$ ',
+                        precision: 2,
+                        separator: ',',
+                        suffixUnit: '',
+                    }}
+                />
+
+                <Input
+                    value={title}
+                    label="Título *"
+                    onChangeValue={setTitle}
+                    style={styles.titleRelease}
+                    placeholder="Título do lançamento"
+                />
+
+                <Label style={styles.labelDescription}>Descrição</Label>
+                <TextArea
+                    value={description}
+                    style={styles.description}
+                    onChangeValue={setDescription}
+                    placeholder={`Descrição sobre esta ${type.includes('SPENDING') ? 'despesa' : 'renda'}`}
+                />
+
+
+                <Container style={styles.containerAddButton}>
                     <Button
-                        key={index}
-                        style={{
-                            button: styles.containerButton(type, option.origin),
-                            text: styles.containerButtonText(type, option.origin)
-                        }}
-                        onPress={() => setType(option.origin)}
+                        style={styles.addButton}
+                        onPress={handleNewRelease}
                     >
-                        {option.name}
+                        Adicionar
                     </Button>
-                ))}
+                </Container>
+
             </Container>
-
-            <Input
-                value={title}
-                label="Título *"
-                onChangeValue={setTitle}
-                style={styles.titleRelease}
-                placeholder="Título do lançamento"
-            />
-
-            <Label style={styles.labelTextArea}>Descrição</Label>
-            <TextArea
-                value={description}
-                onChangeValue={setDescription}
-                placeholder={`Descrição sobre esta ${type.includes('SPENDING') ? 'despesa' : 'renda'}`}
-            />
-
-
-            <Button
-                style={styles.addButton}
-                onPress={handleNewRelease}
-            >
-                Adicionar
-            </Button>
-        </KeyboardAwareScrollView>
+        </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        paddingTop: 50,
+        flex: 1,
         alignItems: 'center',
-        maxHeight: ScreenHeight * 1.1,
+        maxHeight: ScreenHeight * 0.85,
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
     },
-    valueRelease: {
-        marginTop: 20,
-        borderRadius: 10,
-        width: ScreenWidth * 0.5,
+    title: {
+        textAlign: 'center',
+        width: ScreenWidth * 0.96,
+        fontSize: ScreenWidth * 0.05,
+        marginTop: ScreenHeight * 0.1,
+        marginBottom: ScreenHeight * 0.01,
     },
     containerSelector: {
-        marginTop: 50,
+        flexWrap: 'wrap',
         flexDirection: 'row',
         justifyContent: 'center',
         maxHeight: ScreenHeight * 0.1,
-        backgroundColor: Colors.grey_lighten,
+        backgroundColor: Colors.transparent,
     },
     containerButton: (type, origin) => {
         return {
-            borderWidth: 1,
+            borderWidth: 1.2,
             borderRadius: 20,
-            maxWidth: ScreenWidth * 0.25,
+            justifyContent: 'center',
             minWidth: ScreenWidth * 0.25,
             minHeight: ScreenHeight * 0.06,
-            maxHeight: ScreenHeight * 0.06,
             backgroundColor: type === origin ? Colors.blue : Colors.white,
         }
     },
     containerButtonText: (type, origin) => {
         return {
-            fontSize: 16,
+            fontSize: ScreenWidth * 0.04,
             color: type === origin ? Colors.white : Colors.black
         }
     },
-    titleRelease: {
-        marginTop: 85,
-        width: ScreenWidth * 0.7,
-        backgroundColor: Colors.transparent,
+    valueRelease: {
+        width: ScreenWidth * 0.5,
     },
-    labelTextArea: {
-        marginTop: 30,
+    titleRelease: {
+        width: ScreenWidth * 0.7,
+    },
+    labelDescription: {
+        color: Colors.blue,
+        marginTop: ScreenHeight * 0.02,
+    },
+    containerAddButton: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        maxHeight: ScreenHeight * 0.1,
+        backgroundColor: Colors.transparent,
     },
     addButton: {
         button: {
-            marginTop: 50,
-            width: ScreenWidth * 0.7,
+            flex: 1,
+            borderWidth: 2,
+            maxWidth: ScreenWidth * 0.7,
+            backgroundColor: Colors.blue,
+            borderColor: Colors.blue,
         },
+        text: {
+            color: Colors.white,
+        }
     },
 });
 

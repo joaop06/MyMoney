@@ -12,7 +12,7 @@ const TextArea = ({
     onChangeValue,
     editable = true,
     numberOfLines = 10,
-    placeholderColor = Colors.grey,
+    placeholderColor = Colors.grey_lighten_1,
 }) => {
     const [isFocused, setIsFocused] = useState(false)
 
@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
             width: ScreenWidth * 0.7,
             height: ScreenHeight * 0.1,
             opacity: editable ? 1 : 0.7,
-            backgroundColor: editable ? Colors.white : Colors.grey_lighten,
-            borderColor: editable && isFocused ? Colors.blue : Colors.grey,
+            backgroundColor: editable ? Colors.white : Colors.grey_lighten_2,
+            borderColor: editable && isFocused ? Colors.blue : Colors.grey_lighten_1,
         }
     },
 })

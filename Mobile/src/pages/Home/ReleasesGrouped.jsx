@@ -24,35 +24,33 @@ const ReleasesGrouped = ({ route: { params } }) => {
     return (
         <Container style={styles.container}>
             <Container style={styles.title}>
-                <Title style={{ fontSize: 20 }}>{type} {date}:</Title>
+                <Title style={{ fontSize: ScreenWidth * 0.05 }}>{type} {date}:</Title>
 
-                <Text style={{ fontSize: 18 }}>{totalValue}</Text>
+                <Text style={{ fontSize: ScreenWidth * 0.045 }}>{totalValue}</Text>
             </Container>
 
-
-            <List
-                data={dataList}
-                style={styles.list}
-                renderItem={renderItem}
-            />
+            <List style={styles.list} data={dataList} renderItem={renderItem} />
         </Container>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        justifyContent: 'space-between'
+        maxHeight: ScreenHeight * 0.95,
+        justifyContent: 'space-between',
+        // backgroundColor: Colors.blue,
     },
     title: {
-        marginBottom: 30,
         flexDirection: 'row',
         width: ScreenWidth * 0.7,
+        maxHeight: ScreenHeight * 0.15,
         justifyContent: 'space-between',
+        backgroundColor: Colors.transparent,
     },
     list: {
-        marginBottom: 50,
-        maxHeight: ScreenHeight * 0.7,
-
+        elevation: 2,
+        minHeight: ScreenHeight * 0.8,
+        maxHeight: ScreenHeight * 0.8,
     },
 })
 

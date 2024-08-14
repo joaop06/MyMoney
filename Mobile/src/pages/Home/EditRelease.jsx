@@ -17,12 +17,11 @@ import TextArea from "../../components/TextArea";
 import Container from "../../components/Container";
 import InputMask from "../../components/InputMask";
 
-import { StyleSheet } from 'react-native';
 import { useState, useEffect } from "react";
 import { Colors } from '../../utils/Stylization';
+import { StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 
 const config = { headerShown: false };
@@ -99,13 +98,7 @@ const EditRelease = ({ route }) => {
     }
 
     return (
-        <KeyboardAwareScrollView
-            extraHeight={100}
-            extraScrollHeight={20}
-            enableOnAndroid={true}
-            keyboardShouldPersistTaps="handled"
-        >
-
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <Container style={styles.container}>
                 {/* Confirmação de Exclusão */}
                 <Alert
@@ -162,10 +155,10 @@ const EditRelease = ({ route }) => {
                     onChangeValue={(title) => setValueOnNewReleaseData('title', title)}
                 />
 
-                <Label style={styles.labelTextArea(editable)}>Descrição</Label>
+                <Label style={styles.labelDescription(editable)}>Descrição</Label>
                 <TextArea
                     editable={editable}
-                    style={{ marginTop: -50 }}
+                    style={styles.description}
                     value={newReleaseData.description}
                     onChangeValue={(description) => setValueOnNewReleaseData('description', description)}
                     placeholder={`Descrição sobre esta ${releaseData.type.includes('SPENDING') ? 'despesa' : 'renda'}`}
@@ -181,24 +174,27 @@ const EditRelease = ({ route }) => {
                 </Container>
 
             </Container>
-        </KeyboardAwareScrollView>
+        </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         alignItems: 'center',
-        maxHeight: ScreenHeight * 0.9,
+        maxHeight: ScreenHeight * 0.85,
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
     },
     title: {
-        marginTop: 30,
-        marginBottom: 20,
         textAlign: 'center',
         width: ScreenWidth * 0.96,
+        fontSize: ScreenWidth * 0.05,
+        marginTop: ScreenHeight * 0.1,
+        marginBottom: ScreenHeight * 0.01,
     },
     containerSelector: {
+        flexWrap: 'wrap',
         flexDirection: 'row',
         justifyContent: 'center',
         maxHeight: ScreenHeight * 0.1,
@@ -206,32 +202,34 @@ const styles = StyleSheet.create({
     },
     buttonTypeRelease: (type, origin) => {
         return {
-            borderWidth: 1,
+            borderWidth: 1.2,
             borderRadius: 20,
-            maxWidth: ScreenWidth * 0.25,
+            justifyContent: 'center',
             minWidth: ScreenWidth * 0.25,
             minHeight: ScreenHeight * 0.06,
-            maxHeight: ScreenHeight * 0.06,
             backgroundColor: type === origin ? Colors.blue : Colors.white,
         }
     },
     buttonTypeTextRelease: (type, origin) => {
         return {
-            fontSize: 16,
+            fontSize: ScreenWidth * 0.04,
             color: type === origin ? Colors.white : Colors.black
         }
     },
     valueRelease: {
         width: ScreenWidth * 0.5,
     },
-    labelTextArea: (editable) => {
+    titleRelease: {
+        width: ScreenWidth * 0.7,
+    },
+    labelDescription: (editable) => {
         return {
-            marginTop: 10,
+            marginTop: ScreenHeight * 0.02,
             color: editable ? Colors.blue : Colors.grey,
         }
     },
-    titleRelease: {
-        width: ScreenWidth * 0.7,
+    description: {
+        marginTop: ScreenHeight * -0.035,
     },
     containerButtons: {
         flexDirection: 'row',
@@ -242,7 +240,9 @@ const styles = StyleSheet.create({
     actionsButton: (type) => {
         return {
             button: {
+                flex: 1,
                 borderWidth: 2,
+                maxWidth: ScreenWidth * 0.3,
                 backgroundColor: Colors.white,
                 borderColor: type == 'update' ? Colors.blue : Colors.red,
             },

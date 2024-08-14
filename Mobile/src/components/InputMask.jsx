@@ -120,18 +120,18 @@ const InputMask = ({
 const styles = StyleSheet.create({
     input: (editable, isFocused) => {
         return {
-            fontSize: 18,
-            marginBottom: 5,
-            paddingLeft: 30,
             borderRadius: 10,
             color: Colors.black,
             flexDirection: 'row',
             width: ScreenWidth * 0.8,
             height: ScreenHeight * 0.07,
             opacity: editable ? 1 : 0.5,
-            backgroundColor: Colors.grey_lighten,
-            borderBottomWidth: isFocused ? 1.5 : 0.5,
-            borderBottomColor: isFocused ? Colors.blue : Colors.grey_darken,
+            fontSize: ScreenWidth * 0.04,
+            paddingLeft: ScreenWidth * 0.05,
+            marginBottom: ScreenHeight * 0.01,
+            backgroundColor: Colors.transparent,
+            borderBottomWidth: isFocused ? 1.5 : 0.8,
+            borderBottomColor: isFocused ? Colors.blue : Colors.black,
         }
     },
 });

@@ -9,10 +9,10 @@
 import Users from '../../Data/Users';
 import MMKV from '../../utils/MMKV/MMKV';
 
-import { Components } from '../../utils/Stylization';
-import { StyleSheet, BackHandler } from 'react-native';
+import { Colors, Components } from '../../utils/Stylization';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
+import { StyleSheet, BackHandler, SafeAreaView } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -90,41 +90,60 @@ const Home = (data) => {
     );
 
     return (
-        <Container>
-            {/* Confirmação de Logout */}
-            <Alert
-                onCancel={hideAlert}
-                onConfirm={handleConfirm}
-                isVisible={isAlertVisible}
-                content={{ title: 'Deseja Sair?', cancel: 'Cancelar', confirm: 'Sair' }}
-            />
+        <SafeAreaView style={{ flex: 1 }}>
+            <Container style={styles.container}>
+                {/* Confirmação de Logout */}
+                <Alert
+                    onCancel={hideAlert}
+                    onConfirm={handleConfirm}
+                    isVisible={isAlertVisible}
+                    content={{ title: 'Deseja Sair?', cancel: 'Cancelar', confirm: 'Sair' }}
+                />
 
-            <Title style={styles.titles}>Finanças de {firstUserName}</Title>
+                <Title style={styles.title}>Finanças de {firstUserName}</Title>
 
-            <Text style={{ fontSize: 20 }}>
-                Saldo
-                <Title style={styles.titles}> {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title>
-            </Text>
+                <Text style={styles.balanceText}>
+                    Saldo
+                    <Title style={styles.balance}> {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title>
+                </Text>
 
-            <Tab.Navigator style={styles.containerTab} onStateChange={state => handleTabChange(state)}>
-                <Tab.Screen name={NameSpending} component={Spending} />
-                <Tab.Screen name={NameRents} component={Rents} />
-            </Tab.Navigator>
+                <Tab.Navigator style={styles.containerTab}>
+                    <Tab.Screen name={NameRents} component={Rents} />
+                    <Tab.Screen name={NameSpending} component={Spending} />
+                </Tab.Navigator>
 
-        </Container >
+            </Container>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-    titles: {
-        fontSize: 24,
-        marginTop: 25,
-        marginBottom: 15,
+    container: {
+        flex: 1,
+        padding: ScreenWidth * 0.05,
+        justifyContent: 'flex-start',
+        backgroundColor: Colors.transparent,
+    },
+    title: {
         fontWeight: 'bold',
+        fontSize: ScreenWidth * 0.06,
+        marginTop: ScreenHeight * 0.03,
+        marginBottom: ScreenHeight * 0.015,
+    },
+    balanceText: {
+        fontSize: ScreenWidth * 0.045,
+    },
+    balance: {
+        fontWeight: 'bold',
+        fontSize: ScreenWidth * 0.05,
+        marginTop: ScreenHeight * 0.03,
+        marginBottom: ScreenHeight * 0.015,
     },
     containerTab: {
-        height: ScreenHeight,
-        width: ScreenWidth
+        width: ScreenWidth,
+        height: ScreenHeight * 0.5,
+        maxHeight: ScreenHeight * 0.7,
+        backgroundColor: Colors.transparent,
     },
 });
 

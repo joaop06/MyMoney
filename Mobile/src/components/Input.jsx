@@ -14,7 +14,9 @@ const Input = ({
     disabled = false,
     multiline = false,
     numberOfLines = 1,
+    onBlur = () => { },
     inputMode = 'text', // 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url'
+    onFocus = () => { },
     secureTextEntry = false,
     onChangeValue = () => { },
     autoCapitalize = 'sentences',   // 'none': Nenhuma capitalização | 'sentences': Primeira letra de cada sentença | 'words': Primeira letra de cada palavra | 'characters': Todas as letras | undefined;
@@ -36,8 +38,14 @@ const Input = ({
             onChangeText={onChangeValue}
             numberOfLines={numberOfLines}
             autoCapitalize={autoCapitalize}
-            onBlur={() => setIsFocused(false)}
-            onFocus={() => setIsFocused(true)}
+            onBlur={() => {
+                onBlur();
+                setIsFocused(false);
+            }}
+            onFocus={() => {
+                onFocus();
+                setIsFocused(true);
+            }}
             placeholderTextColor={placeholderColor}
             theme={{ colors: { primary: Colors.blue } }}
             secureTextEntry={secureTextEntry && !showPassword}
@@ -58,13 +66,15 @@ const Input = ({
 const styles = StyleSheet.create({
     input: (disabled, isFocused) => {
         return {
-            marginBottom: 5,
             borderRadius: 10,
             flexDirection: 'row',
-            width: ScreenWidth * 0.8,
-            height: ScreenHeight * 0.07,
+            width: ScreenWidth * 0.65,
             opacity: disabled ? 0.7 : 1,
+            fontSize: ScreenWidth * 0.03,
+            height: ScreenHeight * 0.055,
+            marginBottom: ScreenHeight * 0.01,
             backgroundColor: Colors.transparent,
+            borderColor: Colors.black,
         }
     },
 });

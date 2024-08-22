@@ -19,7 +19,7 @@ const CardRelease = ({ item, navigateTo }) => {
                     <MaterialCommunityIcons
                         name={iconName}
                         color={Colors.white}
-                        size={ScreenHeight * 0.035}
+                        size={ScreenHeight * 0.03}
                     />
                 }
             </Container>
@@ -34,37 +34,40 @@ const CardRelease = ({ item, navigateTo }) => {
                     R$ {value.toFixed(2).replace('.', ',')}
                 </Text>
             </Container>
-
         </Button>
     )
 }
 
 const styles = StyleSheet.create({
     button: {
+        margin: 'auto',
         flexDirection: 'row',
-        height: ScreenHeight * 0.07,
+        width: ScreenWidth * 0.7,
+        maxHeight: ScreenHeight * 0.05,
         justifyContent: 'space-between',
+        marginTop: ScreenHeight * 0.015,
         backgroundColor: Colors.blue_lighten_1,
     },
     containerIcon: {
-        height: 100,
+        height: ScreenHeight,
         alignItems: 'flex-start',
         justifyContent: 'center',
         maxWidth: ScreenWidth * 0.15,
+        maxHeight: ScreenHeight * 0.05,
         backgroundColor: Colors.transparent,
     },
     containerText: {
-        height: 100,
+        height: ScreenHeight,
         flexDirection: 'column',
         alignItems: 'flex-start',
         justifyContent: 'center',
+        maxHeight: ScreenHeight * 0.05,
         backgroundColor: Colors.transparent,
     },
     title: {
         marginBottom: 0,
         color: Colors.grey_darken,
-        fontSize: ScreenWidth * 0.035,
-        marginTop: ScreenHeight * 0.02,
+        fontSize: ScreenWidth * 0.03,
     },
     category: {
         marginTop: 2,

@@ -5,14 +5,17 @@
  *  - Campos: valor, data, categoria, descrição.
  *  - Botões para salvar ou cancelar lançamento.
 */
+import moment from "moment";
 import Users from "../../Data/Users";
 import Releases from "../../Data/Releases";
 
+import Text from "../../components/Text";
 import Alert from "../../components/Alert";
 import Input from "../../components/Input";
 import Label from "../../components/Label";
 import Title from "../../components/Title";
 import Button from "../../components/Button";
+import Calendar from "../../components/Calendar";
 import TextArea from "../../components/TextArea";
 import Container from "../../components/Container";
 import InputMask from "../../components/InputMask";
@@ -34,6 +37,11 @@ const EditRelease = ({ route }) => {
     const [releaseData, setReleaseData] = useState({ ...route?.params });
     const [newReleaseData, setNewReleaseData] = useState({ ...route?.params });
 
+    // Tratativa para valores nulos em 'dateRelease'
+    newReleaseData.dateRelease = newReleaseData.dateRelease ? moment(newReleaseData.dateRelease) : moment(newReleaseData.createdAt)
+
+    const [requestNewRelease, setRequestNewRelease] = useState(null)
+    const [calendarVisibility, setCalendarVisibility] = useState(false);
     const optionsToSelect = [{ name: 'Despesas', origin: 'SPENDING' }, { name: 'Rendas', origin: 'RENTS' }]
 
     const showAlertDelete = () => setIsAlertDeleteVisible(true);
@@ -81,10 +89,9 @@ const EditRelease = ({ route }) => {
                 userId: newReleaseData.userId,
                 title: newReleaseData.title.trim(),
                 description: newReleaseData.description.trim(),
+                dateRelease: newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
             }
 
-            console.log('Teve alteração na edição!')
-            console.log(`releaseData: ${JSON.stringify(releaseData)} // newReleaseData: ${JSON.stringify(releaseToUpdate)}`)
             await Releases.update(releaseToUpdate, { id: releaseToUpdate.id })
 
             // Atualiza Saldo Total e Redireciona para tela inicial
@@ -129,22 +136,43 @@ const EditRelease = ({ route }) => {
                     ))}
                 </Container>
 
-                <InputMask
-                    type="money"
-                    label="Valor *"
-                    editable={editable}
-                    inputMode="decimal"
-                    placeholder="Ex: R$ 100,00"
-                    style={styles.valueRelease}
-                    value={newReleaseData.value}
-                    onChangeValue={(value) => setValueOnNewReleaseData('value', value)}
-                    options={{
-                        unit: 'R$ ',
-                        precision: 2,
-                        separator: ',',
-                        suffixUnit: '',
-                    }}
-                />
+                <Container style={styles.containerDateAndValue}>
+                    <InputMask
+                        type="money"
+                        label="Valor *"
+                        editable={editable}
+                        inputMode="decimal"
+                        placeholder="Ex: R$ 100,00"
+                        style={styles.valueRelease}
+                        value={newReleaseData.value}
+                        onChangeValue={(value) => setValueOnNewReleaseData('value', value)}
+                        options={{
+                            unit: 'R$ ',
+                            precision: 2,
+                            separator: ',',
+                            suffixUnit: '',
+                        }}
+                    />
+
+                    <Input
+                        label="Data"
+                        inputMode="decimal"
+                        style={styles.dateRelease}
+                        value={newReleaseData.dateRelease.format('DD/MM/YYYY')}
+                        onFocus={() => setCalendarVisibility(true)}
+                        onBlur={() => setCalendarVisibility(false)}
+                    />
+
+                    <Calendar
+                        isVisible={calendarVisibility}
+                        hideDatePicker={() => setCalendarVisibility(false)}
+                        handleConfirm={selectedDate => {
+                            setCalendarVisibility(false)
+                            setValueOnNewReleaseData('dateRelease', selectedDate)
+                        }}
+                    />
+                </Container>
+
 
                 <Input
                     label="Título *"
@@ -163,6 +191,8 @@ const EditRelease = ({ route }) => {
                     onChangeValue={(description) => setValueOnNewReleaseData('description', description)}
                     placeholder={`Descrição sobre esta ${releaseData.type.includes('SPENDING') ? 'despesa' : 'renda'}`}
                 />
+
+                <Text style={styles.messageRequest}>{requestNewRelease?.message || ''}</Text>
 
                 <Container style={styles.containerButtons}>
                     <Button onPress={editable ? () => { setEditable(false) } : showAlertDelete} style={styles.actionsButton('delete')}>
@@ -189,52 +219,59 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
         width: ScreenWidth * 0.96,
-        fontSize: ScreenWidth * 0.05,
-        marginTop: ScreenHeight * 0.1,
-        marginBottom: ScreenHeight * 0.01,
+        marginTop: ScreenHeight * 0.05,
+        backgroundColor: Colors.transparent,
     },
     containerSelector: {
-        flexWrap: 'wrap',
         flexDirection: 'row',
-        justifyContent: 'center',
+        alignContent: 'center',
+        maxWidth: ScreenWidth * 0.45,
         maxHeight: ScreenHeight * 0.1,
+        justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
     },
     buttonTypeRelease: (type, origin) => {
         return {
-            borderWidth: 1.2,
+            borderWidth: 1,
             borderRadius: 20,
             justifyContent: 'center',
-            minWidth: ScreenWidth * 0.25,
-            minHeight: ScreenHeight * 0.06,
+            minWidth: ScreenWidth * 0.2,
             backgroundColor: type === origin ? Colors.blue : Colors.white,
         }
     },
     buttonTypeTextRelease: (type, origin) => {
         return {
-            fontSize: ScreenWidth * 0.04,
             color: type === origin ? Colors.white : Colors.black
         }
     },
-    valueRelease: {
-        width: ScreenWidth * 0.5,
+    containerDateAndValue: {
+        flexDirection: 'row',
+        maxHeight: ScreenHeight * 0.12,
+        marginBottom: ScreenHeight * -0.07,
+        backgroundColor: Colors.transparent,
+    },
+    dateRelease: {
+        width: ScreenWidth * 0.3,
+        height: ScreenHeight * 0.07,
+        fontSize: ScreenWidth * 0.03,
     },
     titleRelease: {
         width: ScreenWidth * 0.7,
+        height: ScreenHeight * 0.07,
+        minHeight: ScreenHeight * 0.05,
+        marginTop: ScreenHeight * 0.02,
     },
     labelDescription: (editable) => {
         return {
-            marginTop: ScreenHeight * 0.02,
+            marginBottom: ScreenHeight * -0.03,
             color: editable ? Colors.blue : Colors.grey,
         }
-    },
-    description: {
-        marginTop: ScreenHeight * -0.035,
     },
     containerButtons: {
         flexDirection: 'row',
         justifyContent: 'center',
         maxHeight: ScreenHeight * 0.1,
+        marginTop: ScreenHeight * 0.05,
         backgroundColor: Colors.transparent,
     },
     actionsButton: (type) => {
@@ -242,7 +279,9 @@ const styles = StyleSheet.create({
             button: {
                 flex: 1,
                 borderWidth: 2,
-                maxWidth: ScreenWidth * 0.3,
+                borderColor: Colors.blue,
+                margin: ScreenWidth * 0.01,
+                maxWidth: ScreenWidth * 0.35,
                 backgroundColor: Colors.white,
                 borderColor: type == 'update' ? Colors.blue : Colors.red,
             },
@@ -250,7 +289,13 @@ const styles = StyleSheet.create({
                 color: type == 'update' ? Colors.blue : Colors.red
             }
         }
-    }
+    },
+    messageRequest: {
+        color: Colors.red,
+        margin: ScreenHeight * 0.02,
+        fontSize: ScreenWidth * 0.035,
+        backgroundColor: Colors.transparent,
+    },
 });
 
 export default { name: 'EditRelease', screen: EditRelease, config };

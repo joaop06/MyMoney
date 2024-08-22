@@ -1,3 +1,5 @@
+import moment from "moment";
+
 module.exports = {
     mapAttriburesType: {
         'string': ['TEXT'],
@@ -77,15 +79,19 @@ module.exports = {
                     type: 'TEXT',
                     allowNull: true,
                 },
+                dateRelease: {
+                    type: 'DATETIME',
+                    allowNull: true,
+                },
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: new Date().toISOString()
+                    defaultValue: moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: new Date().toISOString()
+                    defaultValue: moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
                 },
             }
         },

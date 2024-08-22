@@ -1,3 +1,4 @@
+import moment from "moment";
 import SQLite from './SQLite';
 import { tables as Tables } from './TablesConfig.js';
 
@@ -20,10 +21,10 @@ export default class CRUD extends SQLite {
 
             if (attributeInTable) {
                 if (onlyValue) {
-                    sqlAttrs.push(attributeInTable.type === 'TEXT' ? `'${value}'` : value)
+                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `'${value}'` : value)
 
                 } else {
-                    sqlAttrs.push(attributeInTable.type === 'TEXT' ? `${key} = '${value}'` : `${key} = ${value}`)
+                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `${key} = '${value}'` : `${key} = ${value}`)
                 }
             }
         })
@@ -55,7 +56,7 @@ export default class CRUD extends SQLite {
         const objectAttributes = Object.keys(object)
         const fieldsToCreate = this.treatTableAttrsOnSql(object, { joinWith: ',', onlyValue: true })
 
-        const now = new Date().toISOString()
+        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
         return await super.executeQuery(`
             INSERT INTO ${this.tableName} (${objectAttributes},createdAt,updatedAt)
             VALUES (${fieldsToCreate},'${now}','${now}')
@@ -69,7 +70,7 @@ export default class CRUD extends SQLite {
 
         return await super.executeQuery(`
             UPDATE ${this.tableName}
-            SET ${fieldsToUpdate}, updatedAt = '${new Date().toISOString()}'
+            SET ${fieldsToUpdate}, updatedAt = '${moment()}'
             WHERE ${whereClause}
         `)
     }

@@ -62,11 +62,23 @@ const InputMask = ({
     editable = true,
 
     /**
+     * Executar função de call back quando o campo
+     * não estiver mais em foco
+     */
+    onBlur = () => { },
+
+    /**
      * Tipo do valor a ser inserido no campo.
      * 'none' | 'text' | 'decimal' | 'numeric' | 'tel' | 'search' | 'email' | 'url'
      * Valor padrão: Texto.
      */
     inputMode = 'text',
+
+    /**
+     * Executar função de call back quando o campo
+     * estiver mais em foco
+     */
+    onFocus = () => { },
 
     /**
      * Oculta o valor do campo.
@@ -104,8 +116,14 @@ const InputMask = ({
             placeholder={placeholder}
             onChangeText={onChangeValue}
             secureTextEntry={secureTextEntry}
-            onBlur={() => setIsFocused(false)}
-            onFocus={() => setIsFocused(true)}
+            onBlur={() => {
+                onBlur();
+                setIsFocused(false);
+            }}
+            onFocus={() => {
+                onFocus();
+                setIsFocused(true);
+            }}
             placeholderTextColor={placeholderColor}
             style={[styles.input(editable, isFocused), style]}
             customTextInputProps={{
@@ -123,10 +141,10 @@ const styles = StyleSheet.create({
             borderRadius: 10,
             color: Colors.black,
             flexDirection: 'row',
-            width: ScreenWidth * 0.8,
+            width: ScreenWidth * 0.4,
             height: ScreenHeight * 0.07,
             opacity: editable ? 1 : 0.5,
-            fontSize: ScreenWidth * 0.04,
+            fontSize: ScreenWidth * 0.03,
             paddingLeft: ScreenWidth * 0.05,
             marginBottom: ScreenHeight * 0.01,
             backgroundColor: Colors.transparent,

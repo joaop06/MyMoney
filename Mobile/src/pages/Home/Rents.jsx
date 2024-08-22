@@ -96,27 +96,20 @@ const Rents = () => {
                 Rendas Totais: {(totalRents).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </Text>
 
-            <List style={styles.list} data={dataRents} renderItem={renderItem} />
+            <List data={dataRents} renderItem={renderItem} />
         </Container>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
-        elevation: 10,
-        margin: 'auto',
-        width: ScreenWidth,
-        maxHeight: ScreenHeight * 0.72,
-        backgroundColor: Colors.grey_lighten_2,
+        width: ScreenWidth * 0.95,
+        backgroundColor: Colors.transparent,
     },
     total: {
-        fontSize: ScreenWidth * 0.04,
         marginTop: ScreenHeight * 0.01,
-    },
-    list: {
-        elevation: 1,
-        marginTop: ScreenHeight * -0.01,
-    },
+        marginBottom: ScreenHeight * 0.02,
+    }
 })
 
 module.exports = { name: 'Rendas', screen: Rents };

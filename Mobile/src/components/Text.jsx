@@ -1,6 +1,7 @@
 import React from 'react';
 import { Colors } from '../utils/Stylization';
 import { Text as TextNative, StyleSheet } from 'react-native';
+import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 
 const Text = ({
     children,
@@ -23,10 +24,9 @@ const Text = ({
 
 const styles = StyleSheet.create({
     text: {
-        fontSize: 18,
-        marginBottom: 20,
         fontWeight: 'bold',
         color: Colors.grey_darken,
+        fontSize: ScreenWidth * 0.035,
     },
 });
 

@@ -140,7 +140,7 @@ const Loading = () => {
                     {isLoggedIn && nameUser !== '' ? `Olá, ${nameUser}!` : 'Olá!'}
                 </Title>
 
-                <Text style={styles.subtitle}>
+                <Text>
                     {isLoggedIn && nameUser !== '' ? 'Bem-vindo de volta! Faça seu Login' : 'Seja Bem-vindo!'}
                 </Text>
 
@@ -187,14 +187,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between'
     },
     title: {
-        fontSize: ScreenWidth * 0.06,
         marginTop: ScreenHeight * 0.1,
     },
-    subtitle: {
-        fontSize: ScreenWidth * 0.045,
-    },
     actionButton: {
-        width: ScreenWidth * 0.8,
         marginBottom: ScreenHeight * 0.1,
     },
     credentialContainer: {
@@ -207,21 +202,22 @@ const styles = StyleSheet.create({
             marginTop: ScreenHeight * 0.02,
         },
         error: {
-            // borderColor: Colors.red
+            borderColor: Colors.red
         },
     },
     messageRequest: {
         color: Colors.red,
         margin: ScreenHeight * 0.02,
-        fontSize: ScreenWidth * 0.035,
+        fontSize: ScreenWidth * 0.03,
+        backgroundColor: Colors.transparent,
     },
     footerText: {
         color: Colors.grey,
-        fontSize: ScreenWidth * 0.04,
+        fontSize: ScreenWidth * 0.03,
     },
     footerRegisterText: {
         color: Colors.blue,
-        fontSize: ScreenWidth * 0.04,
+        fontSize: ScreenWidth * 0.03,
     },
 })
 

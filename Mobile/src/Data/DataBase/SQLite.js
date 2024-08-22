@@ -1,3 +1,4 @@
+import RNFS from 'react-native-fs';
 import { tables as Tables } from './TablesConfig.js';
 import SQLiteStorage from 'react-native-sqlite-storage';
 
@@ -14,7 +15,17 @@ export default class SQLite {
         try {
             SQLite.db = SQLiteStorage.openDatabase(
                 { name: 'mymoney.db', location: 'default' },
-                () => console.log('Database opened successfully'),
+                async () => {
+                    const instance = new SQLite()
+
+                    const migrations = require('./MigrationsSql.js')
+                    for (const migration of migrations) {
+                        console.log(migration);
+                        await instance.executeQuery(migration);
+                    }
+
+                    console.log('Database opened successfully')
+                },
                 (error) => console.error('Error opening database', error)
             );
 

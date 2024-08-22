@@ -21,6 +21,7 @@ const List = ({
 
 const styles = StyleSheet.create({
     list: {
+        elevation: 2,
         borderRadius: 10,
         width: ScreenWidth * 0.9,
         borderBottomLeftRadius: 20,

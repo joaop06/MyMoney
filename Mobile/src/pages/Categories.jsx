@@ -1,5 +1,6 @@
 import Title from '../components/Title';
 import Container from '../components/Container';
+import { ScreenHeight } from '../utils/Dimensions';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
@@ -20,7 +21,7 @@ const config = {
     title: 'Categorias',
     tabBarIcon: () => <MaterialCommunityIcons
         name="shape"
-        size={30}
+        size={ScreenHeight * 0.03}
         color={navigation?.isFocused() ? Icons.focus : Icons.unfocus}
     />
 };

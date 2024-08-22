@@ -30,7 +30,7 @@ const config = {
     headerShown: false,
     tabBarIcon: () => <MaterialCommunityIcons
         name="home"
-        size={30}
+        size={ScreenHeight * 0.03}
         color={navigation?.isFocused() ? Components.Icons.focus : Components.Icons.unfocus}
     />
 };
@@ -107,9 +107,33 @@ const Home = (data) => {
                     <Title style={styles.balance}> {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title>
                 </Text>
 
-                <Tab.Navigator style={styles.containerTab}>
-                    <Tab.Screen name={NameRents} component={Rents} />
-                    <Tab.Screen name={NameSpending} component={Spending} />
+                <Tab.Navigator
+                    screenOptions={{
+                        tabBarActiveTintColor: Colors.blue, // Cor do texto da aba ativa
+                        tabBarInactiveTintColor: Colors.grey_darken, // Cor do texto da aba inativa
+                        tabBarLabelStyle: { fontSize: ScreenWidth * 0.03 }, // Tamanho da fonte do texto das abas
+                        tabBarStyle: { backgroundColor: Colors.grey_lighten_2 }, // Cor de fundo da barra de abas
+                        tabBarIndicatorStyle: {
+                            backgroundColor: Colors.blue, // Cor do indicador abaixo da aba ativa
+                            height: 3, // Altura do indicador
+                        },
+                        tabBarPressColor: Colors.blue_lighten_2, // Cor de fundo ao pressionar a aba
+                    }}
+                    style={styles.containerTab}>
+                    <Tab.Screen name={NameRents} component={Rents} options={{
+                        tabBarLabel: NameRents,
+                        tabBarIcon: ({ color }) => (
+                            <MaterialCommunityIcons name="currency-usd" color={color} size={ScreenHeight * 0.025} />
+                        ),
+                    }}
+                    />
+                    <Tab.Screen name={NameSpending} component={Spending} options={{
+                        tabBarLabel: NameSpending,
+                        tabBarIcon: ({ color }) => (
+                            <MaterialCommunityIcons name="currency-usd-off" color={color} size={ScreenHeight * 0.025} />
+                        ),
+                    }}
+                    />
                 </Tab.Navigator>
 
             </Container>
@@ -126,21 +150,17 @@ const styles = StyleSheet.create({
     },
     title: {
         fontWeight: 'bold',
-        fontSize: ScreenWidth * 0.06,
-        marginTop: ScreenHeight * 0.03,
-        marginBottom: ScreenHeight * 0.015,
+        marginTop: ScreenHeight * 0.01,
     },
     balanceText: {
-        fontSize: ScreenWidth * 0.045,
+        marginBottom: ScreenHeight * 0.015,
     },
     balance: {
         fontWeight: 'bold',
-        fontSize: ScreenWidth * 0.05,
-        marginTop: ScreenHeight * 0.03,
-        marginBottom: ScreenHeight * 0.015,
+        fontSize: ScreenWidth * 0.035,
     },
     containerTab: {
-        width: ScreenWidth,
+        width: ScreenWidth * 0.95,
         height: ScreenHeight * 0.5,
         maxHeight: ScreenHeight * 0.7,
         backgroundColor: Colors.transparent,

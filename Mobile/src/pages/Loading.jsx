@@ -93,6 +93,7 @@ const Loading = () => {
                     )
                 }
             } catch (e) {
+                console.error(e)
                 setValue(
                     { error: true, message: e.message },
                     setRequestLogin,

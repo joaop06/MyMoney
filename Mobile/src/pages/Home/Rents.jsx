@@ -38,10 +38,10 @@ const Rents = () => {
 
                 let totalRentsValue = 0.00
                 const rentsGrouped = rows.reduce((acc, curr) => {
-                    const createdAt = moment(curr.createdAt)
-                    const date = createdAt.format('DD/MM')
+                    const dateRelease = moment(curr.dateRelease ?? curr.createdAt)
+                    const date = dateRelease.format('DD/MM')
 
-                    const title = mapDaysWeek[createdAt.format('dddd')]
+                    const title = mapDaysWeek[dateRelease.format('dddd')]
 
                     const existDate = acc.findIndex(item => item.date === date)
                     if (existDate > -1) {

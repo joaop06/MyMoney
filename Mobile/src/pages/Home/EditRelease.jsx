@@ -157,6 +157,7 @@ const EditRelease = ({ route }) => {
                     <Input
                         label="Data"
                         inputMode="decimal"
+                        disabled={!editable}
                         style={styles.dateRelease}
                         value={newReleaseData.dateRelease.format('DD/MM/YYYY')}
                         onFocus={() => setCalendarVisibility(true)}
@@ -165,6 +166,7 @@ const EditRelease = ({ route }) => {
 
                     <Calendar
                         isVisible={calendarVisibility}
+                        date={newReleaseData.dateRelease}
                         hideDatePicker={() => setCalendarVisibility(false)}
                         handleConfirm={selectedDate => {
                             setCalendarVisibility(false)

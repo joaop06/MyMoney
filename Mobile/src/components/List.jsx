@@ -1,23 +1,33 @@
+import React, { forwardRef } from 'react';
 import { Colors } from '../utils/Stylization';
-import { FlatList, StyleSheet, View } from 'react-native';
-import { ScreenWidth, ScreenHeight } from '../utils/Dimensions'
+import { ScreenWidth } from '../utils/Dimensions'
+import { FlatList, StyleSheet } from 'react-native';
 
-const List = ({
+const List = forwardRef(({
     data = [],
     style = {},
+    horizontal = false,
+    scrollEnabled = true,
     renderItem = () => { },
-    listEmptyComponent = () => null
-}) => {
+    listEmptyComponent = () => null,
+    keyExtractor = (item) => item.id,
+    showsHorizontalScrollIndicator = false,
+}, ref) => {
     return (
         <FlatList
+            ref={ref}
             data={data}
+            horizontal={horizontal}
             renderItem={renderItem}
+            keyExtractor={keyExtractor}
             style={[styles.list, style]}
-            keyExtractor={item => item.id}
+            scrollEnabled={scrollEnabled}
             ListEmptyComponent={listEmptyComponent}
+            // contentContainerStyle={[styles.list, style]}
+            showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
         />
     );
-};
+});
 
 const styles = StyleSheet.create({
     list: {

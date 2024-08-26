@@ -51,7 +51,7 @@ const NewReleases = () => {
 
     const [requestNewRelease, setRequestNewRelease] = useState(null)
     const [calendarVisibility, setCalendarVisibility] = useState(false);
-    const optionsToSelect = [{ name: 'Despesas', origin: 'SPENDING' }, { name: 'Rendas', origin: 'RENTS' }]
+    const optionsToSelect = [{ name: 'Rendas', origin: 'RENTS' }, { name: 'Despesas', origin: 'SPENDING' }]
 
     const setValueState = (value, state, temporary = false, time = 2500) => {
         state(value)
@@ -184,6 +184,7 @@ const NewReleases = () => {
                         isVisible={calendarVisibility}
                         hideDatePicker={() => setCalendarVisibility(false)}
                         handleConfirm={selectedDate => {
+                            selectedDate = moment(selectedDate)
                             setDateRelease(selectedDate)
                             setCalendarVisibility(false)
                         }}

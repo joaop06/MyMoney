@@ -69,12 +69,12 @@ const styles = StyleSheet.create({
             borderRadius: 10,
             flexDirection: 'row',
             width: ScreenWidth * 0.65,
+            borderColor: Colors.black,
+            height: ScreenHeight * 0.06,
             opacity: disabled ? 0.7 : 1,
             fontSize: ScreenWidth * 0.03,
-            height: ScreenHeight * 0.055,
             marginBottom: ScreenHeight * 0.01,
             backgroundColor: Colors.transparent,
-            borderColor: Colors.black,
         }
     },
 });

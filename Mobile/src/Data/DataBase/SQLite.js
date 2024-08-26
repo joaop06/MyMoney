@@ -13,28 +13,21 @@ export default class SQLite {
 
     static async init() {
         try {
+            const instance = new SQLite();
+
             SQLite.db = SQLiteStorage.openDatabase(
                 { name: 'mymoney.db', location: 'default' },
                 async () => {
-                    const instance = new SQLite()
-
                     const migrations = require('./MigrationsSql.js')
                     for (const migration of migrations) {
-                        console.log(migration);
-                        await instance.executeQuery(migration);
+                        await instance.executeQuery(migration)
+                            .catch(err => err);
                     }
-
                     console.log('Database opened successfully')
                 },
                 (error) => console.error('Error opening database', error)
             );
 
-            const instance = new SQLite()
-            if (false) {
-                const tableNames = Tables.map(table => table.name)
-                tableNames.forEach(async table => await instance.executeQuery(`DROP TABLE ${table}`))
-                console.log('Tabelas Dropadas com sucesso!')
-            }
 
             Tables.forEach(async table => {
                 const { attributes } = table

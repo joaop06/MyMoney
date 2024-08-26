@@ -1,83 +1,29 @@
-import moment from 'moment';
-import MMKV from '../../utils/MMKV/MMKV';
 import { StyleSheet } from "react-native";
-import Releases from '../../Data/Releases';
 import { useEffect, useState } from 'react';
 import { Colors } from '../../utils/Stylization';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 
 /** Components */
+import Div from '../../components/Div';
 import List from '../../components/List';
+import { fetchData } from './HomeScreen';
 import Text from '../../components/Text';
 import Container from '../../components/Container';
 import CardRelease from '../../components/CardRelease';
 
-const mapDaysWeek = {
-    "Sunday": "Domingo",
-    "Saturday": "Sábado",
-    "Friday": "Sexta-feira",
-    "Tuesday": "Terça-feira",
-    "Monday": "Segunda-feira",
-    "Thursday": "Quinta-feira",
-    "Wednesday": "Quarta-feira",
-};
-
 const Spending = () => {
-    const [dataSpending, setDataSpending] = useState([]);
-    const [totalSpending, setTotalSpending] = useState([]);
+    const [dataSpending, setDataSpending] = useState(null);
+    const [totalSpending, setTotalSpending] = useState(0.00);
 
-    const fetchData = async () => {
-        if (process.env.FETCH_DATA_SPENDING_IN_PROGRESS != true) {
-            try {
-                process.env.FETCH_DATA_SPENDING_IN_PROGRESS = true
-
-                const { rows } = await Releases.find({
-                    type: 'SPENDING',
-                    userId: await MMKV.find('userId'),
-                })
-
-                let totalSpendingValue = 0.00
-
-                const spendingGrouped = rows.reduce((acc, curr) => {
-                    const dateRelease = moment(curr.dateRelease ?? curr.createdAt)
-                    const date = dateRelease.format('DD/MM')
-
-                    const title = mapDaysWeek[dateRelease.format('dddd')]
-
-                    const existDate = acc.findIndex(item => item.date === date)
-                    if (existDate > -1) {
-                        acc[existDate].dataList.push(curr)
-                        acc[existDate].value += curr.value
-
-                    } else {
-                        acc.push({
-                            date,
-                            title,
-                            dataList: [curr],
-                            value: curr.value,
-                        })
-                    }
-
-                    totalSpendingValue += curr.value
-                    return acc
-                }, [])
-
-                setDataSpending(spendingGrouped)
-                setTotalSpending(totalSpendingValue)
-
-            } catch (e) {
-                console.error('Erro ao buscar Despesas:', e)
-            } finally {
-                process.env.FETCH_DATA_SPENDING_IN_PROGRESS = false
-            }
-        }
+    const fetchDataSpending = async () => {
+        await fetchData('SPENDING', setDataSpending, setTotalSpending);
     }
 
-    fetchData()
+    fetchDataSpending()
     useEffect(() => {
-        const interval = setInterval(fetchData, 1500)
+        const interval = setInterval(fetchDataSpending, 500)
         return () => clearInterval(interval)
-    }, [])
+    }, []);
 
     const renderItem = ({ item }) => {
         const { dataList, date, title, value } = item
@@ -96,18 +42,38 @@ const Spending = () => {
                 Despesas Totais: {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
             </Text>
 
-            <List data={dataSpending} renderItem={renderItem} />
+            {dataSpending === null || dataSpending.length === 0 ?
+                <Div style={styles.phantomDiv}>
+                    <Text>Nenhuma Despesa encontrada</Text>
+                </Div>
+                :
+                <List
+                    data={dataSpending}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                />
+            }
         </Container>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
+        width: ScreenWidth * 0.95,
         backgroundColor: Colors.transparent,
     },
     total: {
         marginTop: ScreenHeight * 0.01,
         marginBottom: ScreenHeight * 0.02,
+    },
+    phantomDiv: {
+        elevation: 2,
+        borderRadius: 10,
+        width: ScreenWidth * 0.9,
+        height: ScreenHeight * 0.55,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        backgroundColor: Colors.grey_lighten_2,
     },
 })
 

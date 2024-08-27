@@ -47,7 +47,7 @@ class Users extends CRUD {
             user = user.rows[0]
 
             const now = moment()
-            now.add(now.hours() + 3, 'hours')
+            now.add(now.days() + 1, 'days')
             const tokenExpiresAt = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
 
             await super.update({ tokenExpiresAt: `${tokenExpiresAt}` }, { id: user.id })

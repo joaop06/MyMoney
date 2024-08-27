@@ -42,7 +42,7 @@ const EditRelease = ({ route }) => {
 
     const [requestNewRelease, setRequestNewRelease] = useState(null)
     const [calendarVisibility, setCalendarVisibility] = useState(false);
-    const optionsToSelect = [{ name: 'Rendas', origin: 'RENTS' }, { name: 'Despesas', origin: 'SPENDING' }]
+    const optionsToSelect = [{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }]
 
     const showAlertDelete = () => setIsAlertDeleteVisible(true);
     const hideAlertDelete = () => setIsAlertDeleteVisible(false);

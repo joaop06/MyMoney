@@ -76,9 +76,10 @@ export const fetchData = async (
 
             let totalRentsValue = 0.00
             const releasesGrouped = rows.reduce((acc, curr) => {
-                const dateRelease = moment(curr.dateRelease ?? curr.createdAt)
-                const date = dateRelease.format('DD/MM')
 
+                const dateRelease = moment.parseZone(curr.dateRelease ?? curr.createdAt);
+
+                const date = dateRelease.format('DD/MM')
                 const title = mapDaysWeek[dateRelease.format('dddd')]
 
                 const existDate = acc.findIndex(item => item.date === date)
@@ -99,6 +100,7 @@ export const fetchData = async (
                 return acc
             }, [])
 
+            // releasesGrouped.forEach(item => item.dataList.forEach(item2 => console.log(item2.title, item2.type, item2.dateRelease)))
             setDataReleases(releasesGrouped)
             setTotalRelease(totalRentsValue)
             process.env.LAST_FETCH_DATA = typeRelease
@@ -120,13 +122,10 @@ const Home = (data) => {
     const [isAlertVisible, setIsAlertVisible] = useState(false);
     const [balance, setBalance] = useState(totalBalance || 0.00);
 
-
     const onMonthChange = (month) => {
         selectedMonth = month
         console.log(`Novo mês selecionado: ${month}`)
     }
-
-
 
     const getName = async () => {
         let firstName = await MMKV.find('firstUserName');
@@ -136,14 +135,12 @@ const Home = (data) => {
     useEffect(() => {
         if (firstUserName == '') getName()
 
-        const interval = setInterval(async () => {
-            if (!totalBalance || totalBalance == 0) {
-                const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
-                setBalance(userData.totalBalance)
-            }
-        }, 0)
-
-        return () => clearInterval(interval)
+        const getTotalBalance = async () => {
+            console.log('!totalBalance || totalBalance == 0, ', totalBalance)
+            const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
+            setBalance(userData.totalBalance)
+        }
+        if (!totalBalance || totalBalance == 0) getTotalBalance()
     }, [])
 
 

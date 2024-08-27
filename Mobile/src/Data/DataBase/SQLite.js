@@ -17,14 +17,7 @@ export default class SQLite {
 
             SQLite.db = SQLiteStorage.openDatabase(
                 { name: 'mymoney.db', location: 'default' },
-                async () => {
-                    const migrations = require('./MigrationsSql.js')
-                    for (const migration of migrations) {
-                        await instance.executeQuery(migration)
-                            .catch(err => err);
-                    }
-                    console.log('Database opened successfully')
-                },
+                () => console.log('Database opened successfully'),
                 (error) => console.error('Error opening database', error)
             );
 
@@ -59,11 +52,53 @@ export default class SQLite {
             })
 
 
-            let userTest = await instance.executeQuery('SELECT * FROM Users WHERE username = "test"')
-            if (userTest.rows.raw().length === 0) {
-                await instance.executeQuery(`INSERT INTO Users (name, username, password) VALUES ('Usuário Teste', 'test', '1')`)
-                console.log('Usuário Teste inserido')
-            }
+            /**
+             * Executa as Migrações do Banco (Alterações nas tabelas)
+             */
+            setTimeout(async () => {
+                const migrations = require('./MigrationsSql.js')
+                for (const migration of migrations) {
+                    await instance.executeQuery(migration)
+                        .catch(err => err);
+                }
+            }, 1000)
+
+
+            /**
+             * Insere Primeiros registros (Usuário teste e Categorias)
+             */
+            setTimeout(async () => {
+                let userTest = await instance.executeQuery('SELECT * FROM Users WHERE username = "test"')
+                if (userTest.rows.raw().length === 0) {
+                    await instance.executeQuery(`INSERT INTO Users (name, username, password) VALUES ('Usuário Teste', 'test', '1')`)
+                    console.log('Usuário Teste inserido')
+                }
+
+                const categories = await instance.executeQuery('SELECT * FROM Categories')
+                if (categories.rows.raw().length === 0) {
+                    await instance.executeQuery(`
+                        INSERT INTO Categories (type, name, label, icon, color)
+                        VALUES
+                        ('SPENDING', 'health', 'Saúde', 'heart-pulse', '#E53935'),
+                        ('SPENDING', 'leisure', 'Lazer', 'pinwheel-outline', '#1E88E5'),
+                        ('SPENDING', 'home', 'Casa', 'home-outline', '#43A047'),
+                        ('SPENDING', 'meals', 'Refeições', 'silverware-variant', '#FB8C00'),
+                        ('SPENDING', 'education', 'Educação', 'school-outline', '#8E24AA'),
+                        ('SPENDING', 'gifts', 'Presentes', 'gift-outline', '#D81B60'),
+                        ('SPENDING', 'transportation', 'Transporte', 'taxi', '#FDD835'),
+                        ('SPENDING', 'others', 'Outros', 'help-circle-outline', '#757575'),
+                        ('RENTS', 'salary', 'Salário', 'cash-multiple', '#43A047'),
+                        ('RENTS', 'freelance', 'Freelance', 'account-cash-outline', '#1E88E5'),
+                        ('RENTS', 'investments', 'Investimentos', 'chart-areaspline', '#8E24AA'),
+                        ('RENTS', 'rent', 'Aluguel', 'home-city-outline', '#FDD835'),
+                        ('RENTS', 'sales', 'Vendas', 'cash-register', '#FB8C00'),
+                        ('RENTS', 'gifts', 'Presentes', 'gift-open-outline', '#D81B60'),
+                        ('RENTS', 'awards', 'Prêmios', 'trophy-variant-outline', '#FFD700'),
+                        ('RENTS', 'others', 'Outros', 'help-circle-outline', '#757575')
+                    `)
+                    console.log('Categorias Inseridas')
+                }
+            }, 2000);
 
         } catch (e) {
             console.error(e)

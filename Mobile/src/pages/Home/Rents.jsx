@@ -21,7 +21,7 @@ const Rents = () => {
 
     fetchDataRents()
     useEffect(() => {
-        const interval = setInterval(fetchDataRents, 500);
+        const interval = setInterval(fetchDataRents, 1000);
         return () => clearInterval(interval)
     }, []);
 

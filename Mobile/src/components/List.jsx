@@ -23,7 +23,6 @@ const List = forwardRef(({
             style={[styles.list, style]}
             scrollEnabled={scrollEnabled}
             ListEmptyComponent={listEmptyComponent}
-            // contentContainerStyle={[styles.list, style]}
             showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
         />
     );

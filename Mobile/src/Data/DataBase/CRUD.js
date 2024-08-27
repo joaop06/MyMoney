@@ -40,7 +40,7 @@ export default class CRUD extends SQLite {
     async find(where = {}) {
         try {
             const whereClause = this.treatTableAttrsOnSql(where, { joinWith: ' AND ' })
-            const result = await super.executeQuery(`SELECT * FROM ${this.tableName} WHERE ${whereClause}`)
+            const result = await super.executeQuery(`SELECT * FROM ${this.tableName} ${whereClause ? 'WHERE ' + whereClause : ''}`)
 
             return {
                 rows: result.rows.raw(),
@@ -57,10 +57,13 @@ export default class CRUD extends SQLite {
         const fieldsToCreate = this.treatTableAttrsOnSql(object, { joinWith: ',', onlyValue: true })
 
         const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-        return await super.executeQuery(`
+        const sqlCreate = `
             INSERT INTO ${this.tableName} (${objectAttributes},createdAt,updatedAt)
             VALUES (${fieldsToCreate},'${now}','${now}')
-        `)
+        `
+
+        console.log(sqlCreate)
+        return await super.executeQuery(sqlCreate)
     }
 
     async update(object, where = {}) {

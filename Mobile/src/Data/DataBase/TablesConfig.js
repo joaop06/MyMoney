@@ -41,12 +41,12 @@ module.exports = {
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: new Date().toISOString()
+                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: new Date().toISOString()
+                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
             }
         },
@@ -71,6 +71,10 @@ module.exports = {
                     type: 'INTEGER',
                     allowNull: false,
                 },
+                categoryId: {
+                    type: 'TEXT',
+                    allowNull: true,
+                },
                 description: {
                     type: 'TEXT',
                     allowNull: true,
@@ -86,12 +90,12 @@ module.exports = {
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
             }
         },
@@ -104,19 +108,35 @@ module.exports = {
                     primaryKey: true,
                     autoIncrement: true,
                 },
+                type: {
+                    type: 'TEXT',
+                    allowNull: false,
+                },
                 name: {
+                    type: 'TEXT',
+                    allowNull: false,
+                },
+                label: {
+                    type: 'TEXT',
+                    allowNull: false,
+                },
+                icon: {
+                    type: 'TEXT',
+                    allowNull: false,
+                },
+                color: {
                     type: 'TEXT',
                     allowNull: false,
                 },
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: new Date().toISOString()
+                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: new Date().toISOString()
+                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
             }
         }

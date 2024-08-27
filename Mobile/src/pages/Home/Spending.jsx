@@ -21,7 +21,7 @@ const Spending = () => {
 
     fetchDataSpending()
     useEffect(() => {
-        const interval = setInterval(fetchDataSpending, 500)
+        const interval = setInterval(fetchDataSpending, 1000)
         return () => clearInterval(interval)
     }, []);
 

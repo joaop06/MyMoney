@@ -1,7 +1,8 @@
+import moment from 'moment';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const Calendar = ({
-    date = new Date(),
+    date = moment(),
     isVisible = false,
     handleConfirm = () => { },
     hideDatePicker = () => { }

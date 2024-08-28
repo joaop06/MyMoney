@@ -103,9 +103,6 @@ const Loading = () => {
         }
     }
 
-
-
-    useEffect(() => { }, [verifyingSession])
     useEffect(() => {
         (async () => {
             const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
@@ -115,6 +112,7 @@ const Loading = () => {
             setValue(firstNameUser, setNameUser)
             return isLogged
         })()
+        return () => { }
     }, [])
 
 

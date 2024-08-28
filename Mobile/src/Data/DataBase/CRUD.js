@@ -42,6 +42,7 @@ export default class CRUD extends SQLite {
             const whereClause = this.treatTableAttrsOnSql(where, { joinWith: ' AND ' })
             const result = await super.executeQuery(`SELECT * FROM ${this.tableName} ${whereClause ? 'WHERE ' + whereClause : ''}`)
 
+            console.log('Buscando em: ', this.tableName)
             return {
                 rows: result.rows.raw(),
                 totalCount: result.rows.length,
@@ -61,8 +62,6 @@ export default class CRUD extends SQLite {
             INSERT INTO ${this.tableName} (${objectAttributes},createdAt,updatedAt)
             VALUES (${fieldsToCreate},'${now}','${now}')
         `
-
-        console.log(sqlCreate)
         return await super.executeQuery(sqlCreate)
     }
 

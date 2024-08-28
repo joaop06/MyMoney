@@ -11,9 +11,9 @@ import MMKV from "../utils/MMKV/MMKV";
 import Releases from "../Data/Releases";
 import Categories from "../Data/Categories";
 
-import { useState, useCallback, useEffect } from "react";
+import { Colors } from "../utils/Stylization";
 import { StyleSheet, ScrollView } from 'react-native';
-import { Colors, Components } from "../utils/Stylization";
+import { useState, useCallback, useEffect } from "react";
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -32,45 +32,43 @@ import InputMask from "../components/InputMask";
 
 
 var navigation
-const { Icons } = Components
 const config = {
-    title: 'Novo Lançamento',
     headerShown: false,
+    title: 'Lançamento',
     tabBarIcon: () => <MaterialCommunityIcons
-        name="rocket-launch"
-        size={ScreenHeight * 0.03}
-        color={navigation?.isFocused() ? Icons.focus : Icons.unfocus}
+        name="plus-box-outline"
+        color={navigation?.isFocused() ? Colors.blue : Colors.grey}
+        size={navigation?.isFocused() ? ScreenHeight * 0.042 : ScreenHeight * 0.037}
     />
 };
 
 const NewReleases = () => {
     navigation = useNavigation();
+    const [allCategories, setAllCategories] = useState([]);
+    const [requestNewRelease, setRequestNewRelease] = useState(null)
+    const [calendarVisibility, setCalendarVisibility] = useState(false);
+    const optionsToSelect = [{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }]
 
+    /**
+     * Dados do Lançamento
+     */
     const [title, setTitle] = useState('');
     const [value, setValue] = useState('0,00');
     const [type, setType] = useState('RENTS');
     const [description, setDescription] = useState('');
     const [dateRelease, setDateRelease] = useState(moment());
+    const [categoryRelease, setCategoryRelease] = useState('');
 
-    const [requestNewRelease, setRequestNewRelease] = useState(null)
-    const [calendarVisibility, setCalendarVisibility] = useState(false);
-
-    const [allCategories, setAllCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [isCategorySelectorVisible, setCategorySelectorVisible] = useState(false);
-
-    const optionsToSelect = [{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }]
 
     /**
      * Busca todas as Catagorias disponíveis
      */
     useEffect(() => {
         const getAllCategories = async () => {
-            const categories = await Categories.find()
-            console.log('Total de Categorias: ', categories.totalCount)
-            setAllCategories(categories.rows)
+            const { rows } = await Categories.find()
+            setAllCategories(rows)
         }
-        getAllCategories()
+        return getAllCategories()
     }, [])
 
     const getCategoriesByType = (typeRelease) => {
@@ -84,16 +82,14 @@ const NewReleases = () => {
         }
     }
 
-    /*
-     * Limpa os campos ao montar o componente ou ao mudar de tela
-     */
+    // Limpa os campos ao montar o componente ou ao mudar de tela
     useFocusEffect(
         useCallback(() => {
             setTitle('');
             setValue('0,00');
             setDescription('');
+            setCategoryRelease('')
             setDateRelease(moment())
-            return
         }, [])
     );
 
@@ -126,13 +122,13 @@ const NewReleases = () => {
                 userId,
                 description,
                 value: parsedValue,
-                categoryId: selectedCategory.id,
+                categoryId: categoryRelease.id,
                 dateRelease: dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
             })
 
             // Atualiza Saldo Total e Redireciona para tela inicial
             const totalBalance = await Users.updateTotalBalance(userId);
-            navigation.navigate('HomeScreen', { totalBalance });
+            navigation.navigate('Home', { totalBalance });
 
         } catch (e) {
             console.error("Erro ao adicionar lançamento:", e);
@@ -145,7 +141,7 @@ const NewReleases = () => {
     }
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1, maxHeight: ScreenHeight * 0.9 }}>
             <Container style={styles.container}>
 
                 <Title style={styles.title}>
@@ -156,13 +152,13 @@ const NewReleases = () => {
                     {optionsToSelect.map((option, index) => (
                         <Button
                             key={index}
-                            style={{
-                                button: styles.containerButton(type, option.origin),
-                                text: styles.containerButtonText(type, option.origin)
-                            }}
                             onPress={() => {
                                 setType(option.origin)
-                                setSelectedCategory('')
+                                if (type !== option.origin) setCategoryRelease('')
+                            }}
+                            style={{
+                                button: styles.buttonTypeRelease(type, option.origin),
+                                text: styles.buttonTypeTextRelease(type, option.origin)
                             }}
                         >
                             {option.name}
@@ -226,34 +222,26 @@ const NewReleases = () => {
 
                 {/*************** Categorias ***************/}
                 <Button
-                    style={styles.selectCategoryButton(selectedCategory)}
-                    onPress={() => setCategorySelectorVisible(!isCategorySelectorVisible)}
+                    disabled={true}
+                    style={styles.selectCategoryButton(categoryRelease)}
                 >
-                    {selectedCategory ? selectedCategory.label : 'Selecione uma Categoria *'}
+                    {categoryRelease ? categoryRelease.label : 'Selecione uma Categoria *'}
                 </Button>
 
-                {isCategorySelectorVisible && (
-                    <Div style={styles.categorySelectorContainer}>
-                        <ScrollView contentContainerStyle={styles.categorySelector}>
-                            {getCategoriesByType(type).map(category => (
-                                <Button
-                                    key={category.id}
-                                    style={styles.categoryOption(category.color)}
-                                    onPress={() => {
-                                        setSelectedCategory(category);
-                                        setCategorySelectorVisible(false);
-                                    }}
-                                >
-                                    <MaterialCommunityIcons name={category.icon} color="white" size={ScreenHeight * 0.04} />
-                                    <Text style={{ fontWeight: 'bold', fontSize: ScreenWidth * 0.022, color: 'white' }}>{category.label}</Text>
-                                </Button>
-                            ))}
-                        </ScrollView>
-                    </Div>
-                )}
-
-
-
+                <Div style={styles.categorySelectorContainer}>
+                    <ScrollView contentContainerStyle={styles.categorySelector}>
+                        {getCategoriesByType(type).map(category => (
+                            <Button
+                                key={category.id}
+                                style={styles.categoryOption(category.color)}
+                                onPress={() => setCategoryRelease(category)}
+                            >
+                                <MaterialCommunityIcons name={category.icon} color="white" size={ScreenHeight * 0.04} />
+                                <Text style={{ fontWeight: 'bold', fontSize: ScreenWidth * 0.022, color: 'white' }}>{category.label}</Text>
+                            </Button>
+                        ))}
+                    </ScrollView>
+                </Div>
 
 
                 <Text style={styles.messageRequest}>{requestNewRelease?.message || ''}</Text>
@@ -274,72 +262,45 @@ const NewReleases = () => {
 
 const styles = StyleSheet.create({
     container: {
-        // flex: 1,
-        // alignItems: 'center',
-        // maxHeight: ScreenHeight * 0.85,
-        // justifyContent: 'space-between',
-        // backgroundColor: Colors.transparent,
-
-
-        // Estilização ChatGPT
         flex: 1,
         alignItems: 'center',
-        backgroundColor: Colors.transparent,
+        maxHeight: ScreenHeight * 0.9,
         paddingBottom: ScreenHeight * 0.02,
+        backgroundColor: Colors.transparent,
     },
     title: {
         textAlign: 'center',
         width: ScreenWidth * 0.96,
-        marginTop: ScreenHeight * 0.05,
+        marginTop: ScreenHeight * 0.02,
         backgroundColor: Colors.transparent,
     },
     containerSelector: {
-        // flexDirection: 'row',
-        // alignContent: 'center',
-        // maxWidth: ScreenWidth * 0.45,
-        // maxHeight: ScreenHeight * 0.1,
-        // justifyContent: 'space-between',
-        // backgroundColor: Colors.transparent,
-
-
-        // Estilização ChatGPT
-        flexDirection: 'row',
         alignItems: 'center',
+        flexDirection: 'row',
+        width: ScreenWidth * 0.8,
         justifyContent: 'space-between',
-        width: ScreenWidth * 0.9,
         marginVertical: ScreenHeight * 0.02,
         backgroundColor: Colors.transparent,
     },
-    containerButton: (type, origin) => ({
+    buttonTypeRelease: (type, origin) => ({
         borderWidth: 1,
         borderRadius: 20,
         justifyContent: 'center',
         minWidth: ScreenWidth * 0.2,
         backgroundColor: type === origin ? Colors.blue : Colors.white,
     }),
-    containerButtonText: (type, origin) => ({
-        // color: type === origin ? Colors.white : Colors.black
-
-
-        // Estilização ChatGPT
+    buttonTypeTextRelease: (type, origin) => ({
         fontWeight: 'bold',
         fontSize: ScreenWidth * 0.03,
         color: type === origin ? Colors.white : Colors.black,
     }),
     containerDateAndValue: {
-        // flexDirection: 'row',
-        // maxHeight: ScreenHeight * 0.12,
-        // marginBottom: ScreenHeight * -0.07,
-        // backgroundColor: Colors.transparent,
-
-
-        // Estilização ChatGPT
-        width: ScreenWidth * 0.9,
-        marginVertical: ScreenHeight * 0.015,
-        flexDirection: 'row',
         alignItems: 'center',
+        flexDirection: 'row',
+        width: ScreenWidth * 0.8,
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
+        marginVertical: ScreenHeight * 0.015,
     },
     dateRelease: {
         width: ScreenWidth * 0.35,
@@ -348,41 +309,33 @@ const styles = StyleSheet.create({
         marginLeft: ScreenWidth * 0.05,
     },
     titleRelease: {
-        // width: ScreenWidth * 0.7,
-        // height: ScreenHeight * 0.07,
-        // minHeight: ScreenHeight * 0.05,
-        // marginTop: ScreenHeight * 0.02,
-
-
-        // Estilização ChatGPT
-        width: ScreenWidth * 0.9,
+        width: ScreenWidth * 0.8,
+        height: ScreenHeight * 0.07,
+        minHeight: ScreenHeight * 0.05,
+        marginTop: ScreenHeight * 0.02,
         backgroundColor: Colors.transparent,
         marginVertical: ScreenHeight * 0.015,
     },
     labelDescription: {
-        // color: Colors.blue,
-        // marginBottom: ScreenHeight * -0.03,
-
-
-        // Estilização ChatGPT
-        marginTop: ScreenHeight * 0.01,
-        width: ScreenWidth * 0.9,
-        fontSize: ScreenWidth * 0.035,
         textAlign: 'left',
+        width: ScreenWidth * 0.8,
+        fontSize: ScreenWidth * 0.035,
+        marginTop: ScreenHeight * 0.025,
         backgroundColor: Colors.transparent,
+        marginBottom: ScreenHeight * -0.015,
     },
     description: {
-        width: ScreenWidth * 0.9,
-        minHeight: ScreenHeight * 0.15,
+        width: ScreenWidth * 0.8,
+        minHeight: ScreenHeight * 0.1,
         marginTop: ScreenHeight * 0.01,
+        marginBottom: ScreenHeight * 0.04,
     },
-
-
     /**
      * Categorias
      */
     selectCategoryButton: (hasCategory) => ({
         button: {
+            opacity: 1,
             borderWidth: 1,
             borderRadius: 10,
             alignItems: 'center',
@@ -397,7 +350,7 @@ const styles = StyleSheet.create({
     categorySelectorContainer: {
         width: ScreenWidth * 0.9,
         maxHeight: ScreenHeight * 0.2,
-        marginTop: ScreenHeight * 0.01,
+        marginTop: ScreenHeight * 0.02,
         backgroundColor: Colors.transparent,
     },
     categorySelector: {
@@ -416,11 +369,9 @@ const styles = StyleSheet.create({
             padding: ScreenHeight * 0.01,
             minHeight: ScreenHeight * 0.07,
             marginHorizontal: ScreenWidth * 0.01,
-            marginVertical: ScreenHeight * 0.005,
+            marginVertical: ScreenHeight * 0.01,
         }
     }),
-
-
     messageRequest: {
         color: Colors.red,
         textAlign: 'center',
@@ -435,7 +386,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         height: ScreenHeight * 0.12,
-        marginBottom: ScreenHeight * 0.06,
         backgroundColor: Colors.transparent,
     },
     addButton: {

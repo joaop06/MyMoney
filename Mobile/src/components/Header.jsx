@@ -61,6 +61,7 @@ const Header = ({
         setTimeout(() => {
             flatListRef.current?.scrollToIndex({ index: selectedMonth, animated: true });
         }, 1000)
+        return () => { }
     }, [])
 
     return (
@@ -76,7 +77,7 @@ const Header = ({
                     />
                 </Button>
 
-                <Div>
+                <Div style={styles.titleBalanceContainer}>
                     <Title style={styles.title}>Finanças de {firstUserName}</Title>
 
                     <Text style={styles.balanceText}>
@@ -139,19 +140,20 @@ const Header = ({
 const styles = StyleSheet.create({
     container: {
         padding: 0,
-        width: ScreenWidth * 0.9,
+        width: ScreenWidth,
         maxHeight: ScreenHeight * 0.15,
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
     },
     firstLine: {
-        width: ScreenWidth * 0.8,
         flexDirection: 'row',
+        width: ScreenWidth * 0.9,
         justifyContent: 'space-between',
+        backgroundColor: Colors.transparent,
     },
     buttonUserSettings: {
         button: {
-            minWidth: ScreenWidth * 0.1,
+            minWidth: ScreenWidth * 0.05,
             backgroundColor: Colors.transparent,
         }
     },
@@ -159,6 +161,9 @@ const styles = StyleSheet.create({
         width: ScreenHeight * 0.05,
         height: ScreenHeight * 0.05,
         borderRadius: ScreenHeight * 0.025,
+    },
+    titleBalanceContainer: {
+        marginRight: ScreenHeight * 0.05,
     },
     title: {
         fontWeight: 'bold',

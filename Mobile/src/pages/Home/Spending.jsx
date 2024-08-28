@@ -6,7 +6,7 @@ import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 /** Components */
 import Div from '../../components/Div';
 import List from '../../components/List';
-import { fetchData } from './HomeScreen';
+import { fetchData } from './Home';
 import Text from '../../components/Text';
 import Container from '../../components/Container';
 import CardRelease from '../../components/CardRelease';
@@ -19,11 +19,13 @@ const Spending = () => {
         await fetchData('SPENDING', setDataSpending, setTotalSpending);
     }
 
-    fetchDataSpending()
     useEffect(() => {
-        const interval = setInterval(fetchDataSpending, 1000)
-        return () => clearInterval(interval)
+        fetchDataSpending()
     }, []);
+    useEffect(() => {
+        const interval = setInterval(fetchDataSpending, 3000)
+        return () => clearInterval(interval)
+    }, [dataSpending]);
 
     const renderItem = ({ item }) => {
         const { dataList, date, title, value } = item

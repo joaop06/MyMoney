@@ -39,12 +39,12 @@ const mapDaysWeek = {
 
 var navigation
 const config = {
-    title: 'Início',
+    title: 'Resumo',
     headerShown: false,
     tabBarIcon: () => <MaterialCommunityIcons
-        name="home"
-        size={ScreenHeight * 0.03}
-        color={navigation?.isFocused() ? Components.Icons.focus : Components.Icons.unfocus}
+        name="home-outline"
+        color={navigation?.isFocused() ? Colors.blue : Colors.grey}
+        size={navigation?.isFocused() ? ScreenHeight * 0.04 : ScreenHeight * 0.035}
     />
 };
 
@@ -100,7 +100,6 @@ export const fetchData = async (
                 return acc
             }, [])
 
-            // releasesGrouped.forEach(item => item.dataList.forEach(item2 => console.log(item2.title, item2.type, item2.dateRelease)))
             setDataReleases(releasesGrouped)
             setTotalRelease(totalRentsValue)
             process.env.LAST_FETCH_DATA = typeRelease
@@ -124,7 +123,6 @@ const Home = (data) => {
 
     const onMonthChange = (month) => {
         selectedMonth = month
-        console.log(`Novo mês selecionado: ${month}`)
     }
 
     const getName = async () => {
@@ -136,11 +134,12 @@ const Home = (data) => {
         if (firstUserName == '') getName()
 
         const getTotalBalance = async () => {
-            console.log('!totalBalance || totalBalance == 0, ', totalBalance)
             const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
             setBalance(userData.totalBalance)
         }
         if (!totalBalance || totalBalance == 0) getTotalBalance()
+
+        return () => { }
     }, [])
 
 
@@ -241,4 +240,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default { name: 'HomeScreen', screen: Home, config };
+export default { name: 'Home', screen: Home, config };

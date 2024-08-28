@@ -1,11 +1,9 @@
 import Title from '../components/Title';
+import { Colors } from '../utils/Stylization';
 import Container from '../components/Container';
 import { ScreenHeight } from '../utils/Dimensions';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-
-import { Components } from '../utils/Stylization';
-const { Icons } = Components
 
 /**
  * ***** Tela de Fechamento do Mês *****
@@ -19,11 +17,10 @@ var navigation
 const config = {
     headerShown: false,
     title: 'Fechamento',
-    tabBarStyle: { fontSize: 25 },
     tabBarIcon: () => <MaterialCommunityIcons
-        name="finance"
-        size={ScreenHeight * 0.03}
-        color={navigation?.isFocused() ? Icons.focus : Icons.unfocus}
+        name="calendar-check-outline"
+        color={navigation?.isFocused() ? Colors.blue : Colors.grey}
+        size={navigation?.isFocused() ? ScreenHeight * 0.04 : ScreenHeight * 0.035}
     />
 };
 const MonthEndClosing = () => {

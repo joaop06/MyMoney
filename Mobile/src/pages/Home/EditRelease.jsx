@@ -8,7 +8,9 @@
 import moment from "moment";
 import Users from "../../Data/Users";
 import Releases from "../../Data/Releases";
+import Categories from "../../Data/Categories";
 
+import Div from "../../components/Div";
 import Text from "../../components/Text";
 import Alert from "../../components/Alert";
 import Input from "../../components/Input";
@@ -25,6 +27,7 @@ import { Colors } from '../../utils/Stylization';
 import { StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const config = { headerShown: false };
@@ -32,9 +35,15 @@ const config = { headerShown: false };
 const EditRelease = ({ route }) => {
     const navigation = useNavigation();
     const [editable, setEditable] = useState(false);
+    const [allCategories, setAllCategories] = useState([]);
+    const [categoryRelease, setCategoryRelease] = useState('');
 
+
+    /**
+     * Dados do Lançamento
+     */
+    const releaseData = { ...route?.params };
     const [hasBeenChange, setHasBeenChange] = useState(false);
-    const [releaseData, setReleaseData] = useState({ ...route?.params });
     const [newReleaseData, setNewReleaseData] = useState({ ...route?.params });
 
     // Tratativa para valores nulos em 'dateRelease'
@@ -42,38 +51,101 @@ const EditRelease = ({ route }) => {
 
     const [requestNewRelease, setRequestNewRelease] = useState(null)
     const [calendarVisibility, setCalendarVisibility] = useState(false);
-    const optionsToSelect = [{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }]
+    const [optionsToSelect, setOptionsToSelect] = useState([{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }])
+    // const optionsToSelect = [{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }]
 
+
+    /**
+     * Busca todas as Catagorias disponíveis
+     */
+    useEffect(() => {
+        const getAllCategories = async () => {
+            const { rows } = await Categories.find()
+            setAllCategories(rows)
+
+
+            // Busca dados da Categoria atual do Lançamento
+            const selectedCategory = rows.find(item => {
+                return item.id == releaseData.categoryId || (item.type === releaseData.type && item.name === 'Outros')
+            })
+            setCategoryRelease(selectedCategory)
+        }
+        getAllCategories()
+        return () => { }
+    }, [])
+
+    const getCategoriesByType = (typeRelease) => {
+        return allCategories.filter(category => category.type === typeRelease)
+    };
+
+
+    /**
+     * Modal de Confirmação
+     */
     const showAlertDelete = () => setIsAlertDeleteVisible(true);
     const hideAlertDelete = () => setIsAlertDeleteVisible(false);
     const [isAlertDeleteVisible, setIsAlertDeleteVisible] = useState(false);
 
+
+    /**
+     * Validação de alteração nos Dados
+     */
     useEffect(() => {
         // Somente faz a comparação se estiver editando
         if (editable) {
             for (let key in releaseData) {
                 if (newReleaseData.hasOwnProperty(key)) {
                     if (releaseData[key] !== newReleaseData[key]) {
-                        return setHasBeenChange(true); // Se algum valor não for igual (houver alteração)
+                        // Se algum valor não for igual, houve alteração
+                        return setHasBeenChange(true);
                     }
                 }
             }
             return setHasBeenChange(false); // Se nao houver alterações
         }
+
+        return () => { }
     }, [newReleaseData])
 
+
+    /**
+     * Atualiza os Dados do Lançamento
+     */
     const setValueOnNewReleaseData = (property, value) => {
-        console.log(`Alteração em "${property}": ${value}`)
         setNewReleaseData({ ...newReleaseData, [property]: value })
     }
 
+
+    /**
+     * Reseta os valores iniciais do componente
+     */
+    const resetInitialState = () => {
+        setEditable(false)
+        setValueOnNewReleaseData('type', releaseData.type)
+        setValueOnNewReleaseData('categoryId', releaseData.categoryId)
+
+        const selectedCategory = allCategories.find(item => {
+            return item.id == releaseData.categoryId || (item.type === releaseData.type && item.name === 'Outros')
+        })
+        setCategoryRelease(selectedCategory)
+        setOptionsToSelect(optionsToSelect)
+    }
+
+
+    /**
+     * Exclui o Lançamento
+     */
     const handleDeleteRelease = async () => {
         const { userId } = releaseData
 
         await Releases.delete(releaseData.id);
-        navigation.navigate('HomeScreen', { totalBalance: await Users.updateTotalBalance(userId) });
+        navigation.navigate('Home', { totalBalance: await Users.updateTotalBalance(userId) });
     }
 
+
+    /**
+     * Realiza a Atualização dos dados do Lançamento
+     */
     const handleEditRelease = async () => {
         let totalBalance
         if (hasBeenChange) {
@@ -88,36 +160,38 @@ const EditRelease = ({ route }) => {
                 type: newReleaseData.type,
                 userId: newReleaseData.userId,
                 title: newReleaseData.title.trim(),
+                categoryId: newReleaseData.categoryId,
                 description: newReleaseData.description.trim(),
                 dateRelease: newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
             }
 
+            // Atualiza os dados do Lançamento e Saldo Total
             await Releases.update(releaseToUpdate, { id: releaseToUpdate.id })
-
-            // Atualiza Saldo Total e Redireciona para tela inicial
             totalBalance = await Users.updateTotalBalance(newReleaseData.userId);
 
-        } else {
-            console.log('Não teve alteração')
-        }
+            navigation.navigate('Home', { totalBalance });
 
-        navigation.navigate('HomeScreen', { totalBalance });
+        } else {
+            resetInitialState()
+            console.log('Não teve alteração, exibir mensagem de "Erro"')
+        }
     }
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <Container style={styles.container}>
-                {/* Confirmação de Exclusão */}
-                <Alert
-                    onCancel={hideAlertDelete}
-                    onConfirm={handleDeleteRelease}
-                    isVisible={isAlertDeleteVisible}
-                    content={{ title: `Excluir ${releaseData.title}?`, cancel: 'Cancelar', confirm: 'Excluir' }}
-                />
+        <ScrollView contentContainerStyle={{ flexGrow: 1, maxHeight: ScreenHeight * 0.9 }}>
+            {/* Confirmação de Exclusão */}
+            <Alert
+                onCancel={hideAlertDelete}
+                onConfirm={handleDeleteRelease}
+                isVisible={isAlertDeleteVisible}
+                content={{ title: `Excluir ${releaseData.title}?`, cancel: 'Cancelar', confirm: 'Excluir' }}
+            />
 
-                <Title style={styles.title}>
-                    {releaseData.type === 'SPENDING' ? 'Despesa' : 'Renda'}: {releaseData.title}
-                </Title>
+
+
+            <Container style={styles.container}>
+
+                <Title style={styles.title}>{releaseData.title}</Title>
 
 
                 <Container style={styles.containerSelector}>
@@ -125,7 +199,10 @@ const EditRelease = ({ route }) => {
                         <Button
                             key={index}
                             disabled={!editable}
-                            onPress={() => setValueOnNewReleaseData('type', option.origin)}
+                            onPress={() => {
+                                setValueOnNewReleaseData('type', option.origin)
+                                if (releaseData.type !== option.origin) setCategoryRelease('')
+                            }}
                             style={{
                                 button: styles.buttonTypeRelease(newReleaseData.type, option.origin),
                                 text: styles.buttonTypeTextRelease(newReleaseData.type, option.origin)
@@ -195,10 +272,51 @@ const EditRelease = ({ route }) => {
                     placeholder={`Descrição sobre esta ${releaseData.type.includes('SPENDING') ? 'despesa' : 'renda'}`}
                 />
 
+
+                {/*************** Categorias ***************/}
+                <Button
+                    disabled={!editable}
+                    style={styles.selectCategoryButton(categoryRelease, !editable)}
+                >
+                    {categoryRelease ? categoryRelease.label : 'Selecione uma Categoria *'}
+                </Button>
+
+                {editable ?
+                    <Div style={styles.categorySelectorContainer}>
+                        <ScrollView contentContainerStyle={styles.categorySelector}>
+                            {getCategoriesByType(newReleaseData.type).map(category => (
+                                <Button
+                                    key={category.id}
+                                    disabled={!editable}
+                                    style={styles.categoryOption(category.color)}
+                                    onPress={() => {
+                                        setCategoryRelease(category)
+                                        setValueOnNewReleaseData('categoryId', category.id)
+                                    }}
+                                >
+                                    <MaterialCommunityIcons name={category.icon} color="white" size={ScreenHeight * 0.04} />
+                                    <Text style={{ fontWeight: 'bold', fontSize: ScreenWidth * 0.022, color: 'white' }}>{category.label}</Text>
+                                </Button>
+                            ))}
+                        </ScrollView>
+                    </Div>
+                    :
+                    <Div name="phantomDiv" style={styles.phantomDiv}></Div>
+                }
+
+
                 <Text style={styles.messageRequest}>{requestNewRelease?.message || ''}</Text>
 
                 <Container style={styles.containerButtons}>
-                    <Button onPress={editable ? () => { setEditable(false) } : showAlertDelete} style={styles.actionsButton('delete')}>
+                    <Button onPress={() => {
+                        if (editable) {
+                            resetInitialState()
+                        } else {
+                            showAlertDelete()
+                        }
+                    }}
+                        style={styles.actionsButton('delete')}
+                    >
                         {editable ? 'Cancelar' : 'Excluir'}
                     </Button>
                     <Button onPress={editable ? handleEditRelease : () => { setEditable(true) }} style={styles.actionsButton('update')}>
@@ -215,90 +333,153 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: 'center',
-        maxHeight: ScreenHeight * 0.85,
-        justifyContent: 'space-between',
+        maxHeight: ScreenHeight * 0.9,
+        paddingBottom: ScreenHeight * 0.02,
         backgroundColor: Colors.transparent,
     },
     title: {
         textAlign: 'center',
         width: ScreenWidth * 0.96,
-        marginTop: ScreenHeight * 0.05,
+        marginTop: ScreenHeight * 0.02,
         backgroundColor: Colors.transparent,
     },
     containerSelector: {
+        alignItems: 'center',
         flexDirection: 'row',
-        alignContent: 'center',
-        maxWidth: ScreenWidth * 0.45,
-        maxHeight: ScreenHeight * 0.1,
+        width: ScreenWidth * 0.8,
+        justifyContent: 'space-between',
+        marginVertical: ScreenHeight * 0.02,
+        backgroundColor: Colors.transparent,
+    },
+    buttonTypeRelease: (type, origin) => ({
+        borderWidth: 1,
+        borderRadius: 20,
+        justifyContent: 'center',
+        minWidth: ScreenWidth * 0.2,
+        backgroundColor: type === origin ? Colors.blue : Colors.white,
+    }),
+    buttonTypeTextRelease: (type, origin) => ({
+        fontWeight: 'bold',
+        fontSize: ScreenWidth * 0.03,
+        color: type === origin ? Colors.white : Colors.black,
+    }),
+    containerDateAndValue: {
+        alignItems: 'center',
+        flexDirection: 'row',
+        width: ScreenWidth * 0.8,
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
-    },
-    buttonTypeRelease: (type, origin) => {
-        return {
-            borderWidth: 1,
-            borderRadius: 20,
-            justifyContent: 'center',
-            minWidth: ScreenWidth * 0.2,
-            backgroundColor: type === origin ? Colors.blue : Colors.white,
-        }
-    },
-    buttonTypeTextRelease: (type, origin) => {
-        return {
-            color: type === origin ? Colors.white : Colors.black
-        }
-    },
-    containerDateAndValue: {
-        flexDirection: 'row',
-        maxHeight: ScreenHeight * 0.12,
-        marginBottom: ScreenHeight * -0.07,
-        backgroundColor: Colors.transparent,
+        marginVertical: ScreenHeight * 0.015,
     },
     dateRelease: {
-        width: ScreenWidth * 0.3,
+        width: ScreenWidth * 0.35,
         height: ScreenHeight * 0.07,
-        fontSize: ScreenWidth * 0.03,
+        minWidth: ScreenWidth * 0.3,
+        marginLeft: ScreenWidth * 0.05,
     },
     titleRelease: {
-        width: ScreenWidth * 0.7,
+        width: ScreenWidth * 0.8,
         height: ScreenHeight * 0.07,
         minHeight: ScreenHeight * 0.05,
         marginTop: ScreenHeight * 0.02,
+        backgroundColor: Colors.transparent,
+        marginVertical: ScreenHeight * 0.015,
     },
-    labelDescription: (editable) => {
-        return {
-            marginBottom: ScreenHeight * -0.03,
-            color: editable ? Colors.blue : Colors.grey,
+    labelDescription: (editable) => ({
+        textAlign: 'left',
+        width: ScreenWidth * 0.8,
+        fontSize: ScreenWidth * 0.035,
+        marginTop: ScreenHeight * 0.025,
+        backgroundColor: Colors.transparent,
+        marginBottom: ScreenHeight * -0.015,
+        color: editable ? Colors.blue : Colors.grey,
+    }),
+    description: {
+        width: ScreenWidth * 0.8,
+        minHeight: ScreenHeight * 0.1,
+        marginTop: ScreenHeight * 0.01,
+        marginBottom: ScreenHeight * 0.04,
+    },
+
+    /**
+     * Categorias
+     */
+    selectCategoryButton: (hasCategory, disabled) => ({
+        button: {
+            borderWidth: 1,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderColor: Colors.black,
+            minWidth: ScreenWidth * 0.5,
+            opacity: disabled ? 0.7 : 1,
+            elevation: disabled ? 0 : 7,
+            marginTop: ScreenHeight * 0.01,
+            backgroundColor: hasCategory ? hasCategory.color : Colors.grey_lighten_1,
         }
+    }),
+    categorySelectorContainer: {
+        width: ScreenWidth * 0.9,
+        maxHeight: ScreenHeight * 0.2,
+        marginTop: ScreenHeight * 0.02,
+        backgroundColor: Colors.transparent,
     },
-    containerButtons: {
+    categorySelector: {
+        flexWrap: 'wrap',
         flexDirection: 'row',
         justifyContent: 'center',
-        maxHeight: ScreenHeight * 0.1,
-        marginTop: ScreenHeight * 0.05,
         backgroundColor: Colors.transparent,
     },
-    actionsButton: (type) => {
-        return {
-            button: {
-                flex: 1,
-                borderWidth: 2,
-                borderColor: Colors.blue,
-                margin: ScreenWidth * 0.01,
-                maxWidth: ScreenWidth * 0.35,
-                backgroundColor: Colors.white,
-                borderColor: type == 'update' ? Colors.blue : Colors.red,
-            },
-            text: {
-                color: type == 'update' ? Colors.blue : Colors.red
-            }
+    categoryOption: (color) => ({
+        button: {
+            borderRadius: 15,
+            alignItems: 'center',
+            backgroundColor: color,
+            justifyContent: 'center',
+            minWidth: ScreenWidth * 0.2,
+            padding: ScreenHeight * 0.01,
+            minHeight: ScreenHeight * 0.07,
+            marginHorizontal: ScreenWidth * 0.01,
+            marginVertical: ScreenHeight * 0.01,
         }
-    },
+    }),
     messageRequest: {
         color: Colors.red,
-        margin: ScreenHeight * 0.02,
+        textAlign: 'center',
+        margin: ScreenHeight * 0.025,
         fontSize: ScreenWidth * 0.035,
+        marginTop: ScreenHeight * 0.02,
         backgroundColor: Colors.transparent,
     },
+    containerButtons: {
+        width: ScreenWidth,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: ScreenHeight * 0.12,
+        backgroundColor: Colors.transparent,
+    },
+    actionsButton: (type) => ({
+        button: {
+            flex: 1,
+            borderWidth: 2,
+            borderColor: Colors.blue,
+            margin: ScreenWidth * 0.05,
+            maxWidth: ScreenWidth * 0.35,
+            backgroundColor: Colors.white,
+            borderColor: type == 'update' ? Colors.blue : Colors.red,
+        },
+        text: {
+            color: type == 'update' ? Colors.blue : Colors.red
+        }
+    }),
+    phantomDiv: {
+        width: ScreenWidth * 0.9,
+        minHeight: ScreenHeight * 0.2,
+        maxHeight: ScreenHeight * 0.2,
+        marginTop: ScreenHeight * 0.02,
+        backgroundColor: Colors.transparent,
+    }
 });
 
 export default { name: 'EditRelease', screen: EditRelease, config };

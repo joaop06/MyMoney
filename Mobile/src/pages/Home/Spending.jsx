@@ -16,7 +16,9 @@ const Spending = () => {
     const [totalSpending, setTotalSpending] = useState(0.00);
 
     const fetchDataSpending = async () => {
-        await fetchData('SPENDING', setDataSpending, setTotalSpending);
+        const { data, total } = await fetchData('SPENDING');
+        setDataSpending(data)
+        setTotalSpending(total)
     }
 
     useEffect(() => {

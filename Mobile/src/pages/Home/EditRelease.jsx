@@ -58,20 +58,20 @@ const EditRelease = ({ route }) => {
     /**
      * Busca todas as Catagorias disponíveis
      */
+    const getAllCategories = async () => {
+        const { rows } = await Categories.find()
+        setAllCategories(rows)
+
+
+        // Busca dados da Categoria atual do Lançamento
+        const selectedCategory = rows.find(item => {
+            return item.id == releaseData.categoryId || (item.type === releaseData.type && item.name === 'Outros')
+        })
+        setCategoryRelease(selectedCategory)
+    }
     useEffect(() => {
-        const getAllCategories = async () => {
-            const { rows } = await Categories.find()
-            setAllCategories(rows)
-
-
-            // Busca dados da Categoria atual do Lançamento
-            const selectedCategory = rows.find(item => {
-                return item.id == releaseData.categoryId || (item.type === releaseData.type && item.name === 'Outros')
-            })
-            setCategoryRelease(selectedCategory)
-        }
         getAllCategories()
-        return () => { }
+        return
     }, [])
 
     const getCategoriesByType = (typeRelease) => {
@@ -97,14 +97,13 @@ const EditRelease = ({ route }) => {
                 if (newReleaseData.hasOwnProperty(key)) {
                     if (releaseData[key] !== newReleaseData[key]) {
                         // Se algum valor não for igual, houve alteração
-                        return setHasBeenChange(true);
+                        setHasBeenChange(true);
+                        return
                     }
                 }
             }
-            return setHasBeenChange(false); // Se nao houver alterações
+            setHasBeenChange(false); // Se nao houver alterações
         }
-
-        return () => { }
     }, [newReleaseData])
 
 

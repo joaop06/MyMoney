@@ -1,7 +1,8 @@
-import * as React from 'react';
 import 'react-native-gesture-handler';
+import React, { useEffect } from 'react';
 import { enableScreens } from 'react-native-screens';
 import { Colors } from './src/utils/Stylization.jsx';
+import Orientation from 'react-native-orientation-locker';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { ScreenWidth, ScreenHeight } from './src/utils/Dimensions';
@@ -67,7 +68,18 @@ function MyTabs() {
   )
 }
 
-function App() {
+const App = () => {
+  useEffect(() => {
+    // Bloqueia a orientação no modo retrato
+    Orientation.lockToPortrait();
+
+    // Limpa o bloqueio quando o componente for desmontado
+    return () => {
+      Orientation.unlockAllOrientations();
+    };
+  }, []);
+
+
   return (
     <NavigationContainer>
       <Stack.Navigator>

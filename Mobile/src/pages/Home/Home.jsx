@@ -11,7 +11,7 @@ import Users from '../../Data/Users';
 import MMKV from '../../utils/MMKV/MMKV';
 import Releases from '../../Data/Releases';
 
-import { Colors, Components } from '../../utils/Stylization';
+import { Colors } from '../../utils/Stylization';
 import React, { useCallback, useEffect, useState } from 'react';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -21,9 +21,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 // import Carousel from 'react-native-snap-carousel';
 
 /** Components */
-import Text from '../../components/Text';
 import Alert from '../../components/Alert';
-import Title from '../../components/Title';
 import Header from '../../components/Header';
 import Container from '../../components/Container';
 
@@ -63,6 +61,7 @@ export const fetchData = async (
         process.env.FETCH_DATA_IN_PROGRESS != true &&
         process.env.LAST_FETCH_DATA !== typeRelease
     ) {
+        let data, total
         try {
             process.env.FETCH_DATA_IN_PROGRESS = true
 
@@ -100,8 +99,17 @@ export const fetchData = async (
                 return acc
             }, [])
 
-            setDataReleases(releasesGrouped)
-            setTotalRelease(totalRentsValue)
+            const releasesSorted = releasesGrouped.sort((a, b) => {
+                const dateA = moment(a.date, 'DD/MM');
+                const dateB = moment(b.date, 'DD/MM');
+
+                // Compara as datas
+                return dateA - dateB;
+            });
+
+
+            data = releasesSorted
+            total = totalRentsValue
             process.env.LAST_FETCH_DATA = typeRelease
 
         } catch (e) {
@@ -109,6 +117,7 @@ export const fetchData = async (
 
         } finally {
             process.env.FETCH_DATA_IN_PROGRESS = false
+            return { data, total }
         }
     }
 }
@@ -139,7 +148,7 @@ const Home = (data) => {
         }
         if (!totalBalance || totalBalance == 0) getTotalBalance()
 
-        return () => { }
+        return
     }, [])
 
 

@@ -21,10 +21,10 @@ export default class CRUD extends SQLite {
 
             if (attributeInTable) {
                 if (onlyValue) {
-                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `'${value}'` : value)
+                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `"${`${value}`.replaceAll('\"', '\'')}"` : value)
 
                 } else {
-                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `${key} = '${value}'` : `${key} = ${value}`)
+                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `${key} = "${`${value}`.replaceAll('\"', '\'')}"` : `${key} = ${value}`)
                 }
             }
         })
@@ -42,7 +42,6 @@ export default class CRUD extends SQLite {
             const whereClause = this.treatTableAttrsOnSql(where, { joinWith: ' AND ' })
             const result = await super.executeQuery(`SELECT * FROM ${this.tableName} ${whereClause ? 'WHERE ' + whereClause : ''}`)
 
-            console.log('Buscando em: ', this.tableName)
             return {
                 rows: result.rows.raw(),
                 totalCount: result.rows.length,

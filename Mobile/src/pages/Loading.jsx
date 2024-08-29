@@ -103,16 +103,17 @@ const Loading = () => {
         }
     }
 
-    useEffect(() => {
-        (async () => {
-            const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
-            const { firstNameUser, tokenIsExpired: isLogged } = await Users.verifyIsLoggedIn(lastLoggedInUser)
+    const verifyIsLoggedIn = async () => {
+        const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
+        const { firstNameUser, tokenIsExpired: isLogged } = await Users.verifyIsLoggedIn(lastLoggedInUser)
 
-            setValue(isLogged, setIsLoggedIn)
-            setValue(firstNameUser, setNameUser)
-            return isLogged
-        })()
-        return () => { }
+        setValue(isLogged, setIsLoggedIn)
+        setValue(firstNameUser, setNameUser)
+    }
+
+    useEffect(() => {
+        verifyIsLoggedIn()
+        return
     }, [])
 
 
@@ -128,7 +129,6 @@ const Loading = () => {
         }, 500);
 
         return () => clearTimeout(timer);
-
     }, [isLoggedIn, navigation])
 
     return (

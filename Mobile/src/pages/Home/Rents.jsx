@@ -16,7 +16,9 @@ const Rents = () => {
     const [totalRents, setTotalRents] = useState(0.00);
 
     const fetchDataRents = async () => {
-        await fetchData('RENTS', setDataRents, setTotalRents);
+        const { data, total } = await fetchData('RENTS');
+        setDataRents(data)
+        setTotalRents(total)
     }
 
     useEffect(() => {

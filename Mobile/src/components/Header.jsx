@@ -1,4 +1,3 @@
-import moment from 'moment';
 import { Colors } from '../utils/Stylization';
 import { StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -12,6 +11,9 @@ import List from './List';
 import Title from './Title';
 import Button from './Button';
 import Container from './Container';
+
+import Users from '../Data/Users';
+import MMKV from '../utils/MMKV/MMKV';
 
 const months = [
     { id: 0, label: 'Janeiro' },
@@ -38,6 +40,8 @@ const Header = ({
     const navigation = useNavigation();
     const flatListRef = useRef(currentMonth);
     const [selectedMonth, setSelectedMonth] = useState(currentMonth);
+    const [totalBalance, setTotalBalance] = useState(balance);
+
 
     const handleMonthPress = (index) => {
         if (index < 0) index = 0
@@ -48,6 +52,26 @@ const Header = ({
         flatListRef.current?.scrollToIndex({ index, animated: true });
     };
 
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
+            console.log('Buscando Saldo Total: R$', userData.totalBalance)
+            setTotalBalance(userData.totalBalance)
+        }, 1000);
+
+        return () => clearInterval(interval)
+    }, [])
+
+
+    const setInitialMonth = () => flatListRef?.current?.scrollToIndex({ index: selectedMonth, animated: true });
+    useEffect(() => {
+        try {
+            setTimeout(setInitialMonth, 1000)
+        } catch (e) {
+            console.error(`Erro ao definir Mês padrão: ${e.message}`)
+        }
+    }, [])
+
     const renderItem = ({ item, index }) => (
         <Button
             onPress={() => handleMonthPress(index)}
@@ -56,13 +80,6 @@ const Header = ({
             {item.label}
         </Button>
     )
-
-    useEffect(() => {
-        setTimeout(() => {
-            flatListRef.current?.scrollToIndex({ index: selectedMonth, animated: true });
-        }, 1000)
-        return () => { }
-    }, [])
 
     return (
         <Container style={styles.container}>
@@ -82,7 +99,7 @@ const Header = ({
 
                     <Text style={styles.balanceText}>
                         Saldo
-                        <Title style={styles.balance}> {(balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title>
+                        <Title style={styles.balance}> {(totalBalance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} </Title>
                     </Text>
                 </Div>
 

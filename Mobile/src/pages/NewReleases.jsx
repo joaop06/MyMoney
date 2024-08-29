@@ -63,12 +63,13 @@ const NewReleases = () => {
     /**
      * Busca todas as Catagorias disponíveis
      */
+    const getAllCategories = async () => {
+        const { rows } = await Categories.find()
+        setAllCategories(rows)
+    }
     useEffect(() => {
-        const getAllCategories = async () => {
-            const { rows } = await Categories.find()
-            setAllCategories(rows)
-        }
-        return getAllCategories()
+        getAllCategories()
+        return
     }, [])
 
     const getCategoriesByType = (typeRelease) => {
@@ -93,23 +94,29 @@ const NewReleases = () => {
         }, [])
     );
 
-    const handleNewRelease = async () => {
+    const handleCreateNewRelease = async () => {
         setTitle(title.trim());
         setDescription(description.trim());
+        const parsedValue = parseFloat(value.replace('R$ ', '').replaceAll('.', '').replace(',', '.') || 0.00);
 
-        const parsedValue = parseFloat(
-            value.replace('R$ ', '').replaceAll('.', '').replace(',', '.')
-            || 0.00
-        );
+
+        const handlerError = (message) => setValueState(
+            { error: true, message },
+            setRequestNewRelease,
+            true
+        )
 
         // Tratativa de campos vazios para inserção
-        if (parsedValue <= 0.00 || !title) {
-            return setValueState(
-                { error: true, message: 'Preencha os campos obrigatórios' },
-                setRequestNewRelease,
-                true
-            )
+        if (parsedValue <= 0.00) {
+            return handlerError('Preencha o valor do lançamento')
+
+        } else if (!title) {
+            return handlerError('Preencha o título do lançamento')
+
+        } else if (!categoryRelease?.id) {
+            return handlerError('Selecione a categoria do lançamento')
         }
+
 
         try {
             // Todos os Lançamentos do tipo selecionado
@@ -249,7 +256,7 @@ const NewReleases = () => {
                 <Container style={styles.containerAddButton}>
                     <Button
                         style={styles.addButton}
-                        onPress={handleNewRelease}
+                        onPress={handleCreateNewRelease}
                     >
                         Adicionar
                     </Button>
@@ -348,10 +355,13 @@ const styles = StyleSheet.create({
         }
     }),
     categorySelectorContainer: {
+        elevation: 1,
         width: ScreenWidth * 0.9,
-        maxHeight: ScreenHeight * 0.2,
+        padding: ScreenWidth * 0.015,
+        maxHeight: ScreenHeight * 0.21,
         marginTop: ScreenHeight * 0.02,
-        backgroundColor: Colors.transparent,
+        borderRadius: ScreenWidth * 0.03,
+        backgroundColor: Colors.grey_lighten_2,
     },
     categorySelector: {
         flexWrap: 'wrap',

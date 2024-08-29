@@ -7,24 +7,28 @@ import { StyleSheet } from "react-native";
 import { Colors } from '../utils/Stylization';
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 
-const Alert = ({ isVisible, onCancel, onConfirm, stylization }) => {
-
-    stylization
+const Alert = ({
+    onCancel,
+    onConfirm,
+    isVisible = false,
+    content = { title: '', cancel: '', confirm: '' },
+}) => {
+    const { title, cancel, confirm } = content
 
     return (
         <Modal isVisible={isVisible}>
             <Container style={styles.container}>
 
-                <Text style={styles.title}>Deseja Sair?</Text>
+                <Text style={styles.title}>{title}</Text>
 
                 <Container style={styles.buttonContainer}>
 
-                    <Button onPress={onCancel} style={{ button: styles.button, text: styles.cancelButtonText }} >
-                        Cancelar
+                    <Button onPress={onCancel} style={{ button: styles.button('cancel'), text: styles.cancelButtonText }} >
+                        {cancel}
                     </Button>
 
-                    <Button onPress={onConfirm} style={{ button: styles.button, text: styles.confirmButtonText }} >
-                        Sair
+                    <Button onPress={onConfirm} style={{ button: styles.button('confirm'), text: styles.confirmButtonText }} >
+                        {confirm}
                     </Button>
 
                 </Container>
@@ -39,13 +43,16 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         maxWidth: ScreenWidth * 0.9,
-        maxHeight: ScreenHeight * 0.18,
         backgroundColor: Colors.white,
+        maxHeight: ScreenHeight * 0.2,
+        paddingVertical: ScreenHeight * 0.02,
+        paddingHorizontal: ScreenWidth * 0.05,
     },
     title: {
-        fontSize: 18,
-        marginBottom: 20,
+        textAlign: 'center',
         color: Colors.black,
+        fontSize: ScreenWidth * 0.04,
+        marginBottom: ScreenHeight * 0.02,
     },
     buttonContainer: {
         alignItems: 'center',
@@ -54,16 +61,27 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
     },
-    button: {
-        marginHorizontal: 10,
-        width: ScreenWidth * 0.3,
-        backgroundColor: Colors.transparent,
+    button: (type) => {
+        return {
+            borderWidth: 1,
+            borderRadius: 10,
+            marginHorizontal: 10,
+            width: ScreenWidth * 0.3,
+            paddingHorizontal: ScreenWidth * 0.05,
+            paddingVertical: ScreenHeight * 0.015,
+            borderColor: type === 'cancel' ? Colors.blue_lighten_1 : Colors.transparent,
+            backgroundColor: type === 'cancel' ? Colors.blue_lighten_3 : Colors.red_lighten_2,
+        }
     },
     cancelButtonText: {
-        color: Colors.red
+        color: Colors.blue,
+        textAlign: 'center',
+        fontSize: ScreenWidth * 0.04,
     },
     confirmButtonText: {
-        color: Colors.blue,
+        color: Colors.red,
+        textAlign: 'center',
+        fontSize: ScreenWidth * 0.04,
     },
 })
 

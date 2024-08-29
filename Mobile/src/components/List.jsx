@@ -1,30 +1,41 @@
-import Text from './Text';
-import Title from './Title';
-import Button from './Button';
+import React, { forwardRef } from 'react';
 import { Colors } from '../utils/Stylization';
+import { ScreenWidth } from '../utils/Dimensions'
 import { FlatList, StyleSheet } from 'react-native';
-import { ScreenWidth, ScreenHeight } from '../utils/Dimensions'
 
-const List = ({
+const List = forwardRef(({
     data = [],
     style = {},
-    renderItem = () => { }
-}) => {
+    horizontal = false,
+    scrollEnabled = true,
+    renderItem = () => { },
+    listEmptyComponent = () => null,
+    keyExtractor = (item) => item.id,
+    showsHorizontalScrollIndicator = false,
+}, ref) => {
     return (
         <FlatList
+            ref={ref}
             data={data}
-            style={[styles.list, style]}
+            horizontal={horizontal}
             renderItem={renderItem}
-            keyExtractor={item => item.id}
+            keyExtractor={keyExtractor}
+            style={[styles.list, style]}
+            scrollEnabled={scrollEnabled}
+            ListEmptyComponent={listEmptyComponent}
+            showsHorizontalScrollIndicator={showsHorizontalScrollIndicator}
         />
     );
-};
+});
 
 const styles = StyleSheet.create({
     list: {
+        elevation: 2,
+        borderRadius: 10,
         width: ScreenWidth * 0.9,
-        minHeight: ScreenHeight * 0.6,
-        backgroundColor: Colors.transparent,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        backgroundColor: Colors.grey_lighten_2,
     },
 });
 

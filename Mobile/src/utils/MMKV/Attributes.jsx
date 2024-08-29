@@ -7,6 +7,10 @@ module.exports = {
         type: "number",
         defaultValue: null,
     },
+    firstUserName: {
+        type: "string",
+        defaultValue: '',
+    },
     accessToken: {
         type: "string",
         defaultValue: "",

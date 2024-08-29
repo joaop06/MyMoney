@@ -1,3 +1,4 @@
+import moment from "moment";
 import Releases from "./Releases";
 import CRUD from "./DataBase/CRUD";
 
@@ -29,9 +30,9 @@ class Users extends CRUD {
             let user = await super.find({ username })
             user = user.rows[0]
 
-            const tokenIsExpired = new Date(user?.tokenExpiresAt || new Date()) > new Date()
+            const tokenIsExpired = moment(user?.tokenExpiresAt || moment()) > moment()
 
-            return tokenIsExpired
+            return { firstNameUser: user.name, tokenIsExpired }
 
         } catch (e) {
             console.error('Erro ao verificar usuário logado', e)
@@ -45,17 +46,17 @@ class Users extends CRUD {
         if (user.totalCount > 0) {
             user = user.rows[0]
 
-            const now = new Date()
-            now.setHours(now.getHours() + 3)
-            const tokenExpiresAt = now.toISOString()
+            const now = moment()
+            now.add(now.days() + 1, 'days')
+            const tokenExpiresAt = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
 
-            await super.update({ tokenExpiresAt: `'${tokenExpiresAt}'` }, { id: user.id })
+            await super.update({ tokenExpiresAt: `${tokenExpiresAt}` }, { id: user.id })
 
             success = true
             return { success, user }
+        } else {
+            throw new Error('Usuário não encontrado')
         }
-
-        return { success }
     }
 
     async updateTotalBalance(userId) {

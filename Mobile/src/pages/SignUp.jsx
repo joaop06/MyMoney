@@ -6,18 +6,13 @@ import Container from '../components/Container';
 
 import { useState } from 'react';
 import Users from '../Data/Users';
-import { StyleSheet } from 'react-native';
 import { Colors } from "../utils/Stylization";
-import { ScreenWidth } from '../utils/Dimensions';
+import { StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 
 
-const config = {
-    title: 'Cadastro',
-    headerTitleStyle: { color: Colors.blue },
-    headerStyle: { backgroundColor: Colors.grey_lighten }
-};
-
+const config = { headerShown: false };
 
 const SignUp = () => {
     const navigation = useNavigation();
@@ -28,6 +23,8 @@ const SignUp = () => {
     const [username, setUsername] = useState('');
 
     const setValue = (value, state, temporary = false, time = 3500) => {
+        if (typeof value === 'string') value = value.trim()
+
         state(value)
         if (temporary) {
             setTimeout(() => state(null), time)
@@ -59,57 +56,65 @@ const SignUp = () => {
 
 
     return (
-        <Container style={styles.credentialContainer}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 
-            <Container style={styles.inputsContainer}>
-                <Input
-                    label="Nome"
-                    placeholder="Primeiro Nome"
-                    onChangeValue={setName}
-                    style={[styles.input.default, requestSignUp?.error && styles.input.error]}
-                />
-                <Input
-                    label="Usuário"
-                    onChangeValue={setUsername}
-                    placeholder="Informe seu usuário"
-                    style={[styles.input.default, requestSignUp?.error && styles.input.error]}
-                />
-                <Input
-                    label="Senha"
-                    secureTextEntry={true}
-                    onChangeValue={setPassword}
-                    placeholder="Digite sua senha"
-                    style={[styles.input.default, requestSignUp?.error && styles.input.error]}
-                />
+            <Container style={styles.credentialContainer}>
 
-                <Text
-                    style={{ marginTop: 25, color: Colors.red }}
-                >
-                    {requestSignUp?.message || ''}
-                </Text>
+                <Container style={styles.inputsContainer}>
+                    <Input
+                        label="Nome"
+                        placeholder="Primeiro Nome"
+                        onChangeValue={(value) => setValue(value, setName)}
+                        style={[styles.input.default, requestSignUp?.error && styles.input.error]}
+                    />
+                    <Input
+                        label="Usuário"
+                        autoCapitalize="none"
+                        placeholder="Informe seu usuário"
+                        onChangeValue={(value) => setValue(value, setUsername)}
+                        style={[styles.input.default, requestSignUp?.error && styles.input.error]}
+                    />
+                    <Input
+                        label="Senha"
+                        secureTextEntry={true}
+                        onChangeValue={(value) => setValue(value, setPassword)}
+                        placeholder="Digite sua senha"
+                        style={[styles.input.default, requestSignUp?.error && styles.input.error]}
+                    />
+
+                    <Text
+                        style={{ marginTop: 25, color: Colors.red }}
+                    >
+                        {requestSignUp?.message || ''}
+                    </Text>
+                </Container>
+
+                <Button style={{ button: styles.registerButton }} onPress={registerUser}>Cadastrar</Button >
+
             </Container>
-
-            <Button style={{ button: styles.registerButton }} onPress={registerUser}>Cadastrar</Button >
-
-        </Container>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     credentialContainer: {
-        paddingBottom: 100,
+        paddingBottom: ScreenHeight * 0.15,
         justifyContent: 'space-between',
     },
     inputsContainer: {
-
+        margin: 'auto',
+        maxHeight: ScreenHeight * 0.35,
+        justifyContent: 'space-around',
+        marginBottom: ScreenHeight * 0.1,
     },
     input: {
         default: {
-            marginTop: 10,
+            marginBottom: ScreenHeight * 0.04,
+            backgroundColor: Colors.transparent,
         },
     },
     registerButton: {
-        width: ScreenWidth * 0.8
+        marginBottom: ScreenHeight * 0.15,
     },
 })
 

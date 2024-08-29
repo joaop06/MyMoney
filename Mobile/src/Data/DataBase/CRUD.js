@@ -1,3 +1,4 @@
+import moment from "moment";
 import SQLite from './SQLite';
 import { tables as Tables } from './TablesConfig.js';
 
@@ -20,10 +21,10 @@ export default class CRUD extends SQLite {
 
             if (attributeInTable) {
                 if (onlyValue) {
-                    sqlAttrs.push(attributeInTable.type === 'TEXT' ? `'${value}'` : value)
+                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `"${`${value}`.replaceAll('\"', '\'')}"` : value)
 
                 } else {
-                    sqlAttrs.push(attributeInTable.type === 'TEXT' ? `${key} = '${value}'` : `${key} = ${value}`)
+                    sqlAttrs.push(['TEXT', 'DATETIME'].includes(attributeInTable.type) ? `${key} = "${`${value}`.replaceAll('\"', '\'')}"` : `${key} = ${value}`)
                 }
             }
         })
@@ -39,7 +40,7 @@ export default class CRUD extends SQLite {
     async find(where = {}) {
         try {
             const whereClause = this.treatTableAttrsOnSql(where, { joinWith: ' AND ' })
-            const result = await super.executeQuery(`SELECT * FROM ${this.tableName} WHERE ${whereClause}`)
+            const result = await super.executeQuery(`SELECT * FROM ${this.tableName} ${whereClause ? 'WHERE ' + whereClause : ''}`)
 
             return {
                 rows: result.rows.raw(),
@@ -55,10 +56,12 @@ export default class CRUD extends SQLite {
         const objectAttributes = Object.keys(object)
         const fieldsToCreate = this.treatTableAttrsOnSql(object, { joinWith: ',', onlyValue: true })
 
-        return await super.executeQuery(`
-            INSERT INTO ${this.tableName} (${objectAttributes})
-            VALUES (${fieldsToCreate})
-        `)
+        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+        const sqlCreate = `
+            INSERT INTO ${this.tableName} (${objectAttributes},createdAt,updatedAt)
+            VALUES (${fieldsToCreate},'${now}','${now}')
+        `
+        return await super.executeQuery(sqlCreate)
     }
 
     async update(object, where = {}) {
@@ -68,7 +71,7 @@ export default class CRUD extends SQLite {
 
         return await super.executeQuery(`
             UPDATE ${this.tableName}
-            SET ${fieldsToUpdate}, updatedAt = '${new Date().toISOString()}'
+            SET ${fieldsToUpdate}, updatedAt = '${moment()}'
             WHERE ${whereClause}
         `)
     }

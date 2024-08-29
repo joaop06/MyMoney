@@ -1,96 +1,83 @@
-import MMKV from '../../utils/MMKV/MMKV';
-import Releases from '../../Data/Releases';
-
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 import { useEffect, useState } from 'react';
 import { Colors } from '../../utils/Stylization';
-import { ScreenHeight } from '../../utils/Dimensions';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 
 /** Components */
+import Div from '../../components/Div';
 import List from '../../components/List';
+import { fetchData } from './Home';
 import Text from '../../components/Text';
-import Button from '../../components/Button';
 import Container from '../../components/Container';
-
+import CardRelease from '../../components/CardRelease';
 
 const Spending = () => {
-    const [dataSpending, setDataSpending] = useState([]);
-    const [totalSpending, setTotalSpending] = useState([]);
+    const [dataSpending, setDataSpending] = useState(null);
+    const [totalSpending, setTotalSpending] = useState(0.00);
 
-    const fetchData = async () => {
-        if (process.env.FETCH_DATA_SPENDING_IN_PROGRESS != true) {
-            try {
-                process.env.FETCH_DATA_SPENDING_IN_PROGRESS = true
-
-                const { rows } = await Releases.find({
-                    type: 'SPENDING',
-                    userId: await MMKV.find('userId'),
-                })
-                setDataSpending(rows)
-
-                let totalSpendingValue = 0.00
-                rows.forEach(rent => totalSpendingValue += rent.value)
-                setTotalSpending(totalSpendingValue)
-
-            } catch (e) {
-                console.error(e)
-            } finally {
-                process.env.FETCH_DATA_SPENDING_IN_PROGRESS = false
-            }
-        }
+    const fetchDataSpending = async () => {
+        const { data, total } = await fetchData('SPENDING');
+        setDataSpending(data)
+        setTotalSpending(total)
     }
 
-    fetchData()
     useEffect(() => {
-        const interval = setInterval(fetchData, 1000)
+        fetchDataSpending()
+    }, []);
+    useEffect(() => {
+        const interval = setInterval(fetchDataSpending, 3000)
         return () => clearInterval(interval)
-    }, [])
+    }, [dataSpending]);
 
-    const renderItem = ({ item }) => (
-        <Button style={{ button: styles.itemList.button }} navigateTo={{ name: 'EditRelease', data: item }} >
-            <MaterialCommunityIcons
-                name="rocket-launch"
-                size={30}
-                color={Colors.white}
+    const renderItem = ({ item }) => {
+        const { dataList, date, title, value } = item
+
+        return (
+            <CardRelease
+                item={{ prefix: date, title, value }}
+                navigateTo={{ name: 'ReleasesGrouped', data: { date, dataList, totalValue: value, type: 'Despesas' } }}
             />
-            <Text style={styles.itemList.title}>{item.title}</Text>
-            <Text style={styles.itemList.value}>{(item.value || 0.00).toFixed(2).replace('.', ',')}</Text>
-        </Button>
-    )
+        )
+    }
 
     return (
-        <Container>
-            <Text style={{ fontSize: 16 }}>Despesas Totais: {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+        <Container style={styles.container}>
+            <Text style={styles.total}>
+                Despesas Totais: {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </Text>
 
-            <List
-                data={dataSpending}
-                renderItem={renderItem}
-            />
+            {dataSpending === null || dataSpending.length === 0 ?
+                <Div style={styles.phantomDiv}>
+                    <Text>Nenhuma Despesa encontrada</Text>
+                </Div>
+                :
+                <List
+                    data={dataSpending}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id}
+                />
+            }
         </Container>
     )
 }
 
 const styles = StyleSheet.create({
-    itemList: {
-        button: {
-            margin: 7,
-            padding: 0,
-            flexDirection: 'row',
-            height: ScreenHeight * 0.07,
-            justifyContent: 'space-around',
-            backgroundColor: Colors.blue_lighten,
-        },
-        title: {
-            marginBottom: 0,
-            color: Colors.black,
-            alignContent: 'center',
-        },
-        value: {
-            marginBottom: 0,
-            color: Colors.white,
-            alignContent: 'center',
-        },
+    container: {
+        width: ScreenWidth * 0.95,
+        backgroundColor: Colors.transparent,
+    },
+    total: {
+        marginTop: ScreenHeight * 0.01,
+        marginBottom: ScreenHeight * 0.02,
+    },
+    phantomDiv: {
+        elevation: 2,
+        borderRadius: 10,
+        width: ScreenWidth * 0.9,
+        height: ScreenHeight * 0.55,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        backgroundColor: Colors.grey_lighten_2,
     },
 })
 

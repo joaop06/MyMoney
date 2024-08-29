@@ -1,12 +1,13 @@
 import React from 'react';
 import { Colors } from '../utils/Stylization';
-import { ScreenHeight } from '../utils/Dimensions';
 import { useNavigation } from '@react-navigation/native';
+import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 const Button = ({
     children,
     style = {},
+    disabled = false,
     timeoutNavigate = 0,
     onPress = () => { },
     navigateTo = { name: '', data: {} },
@@ -16,7 +17,8 @@ const Button = ({
 
     return (
         <TouchableOpacity
-            style={{ ...stylesDefault.button, ...button }}
+            disabled={disabled}
+            style={{ ...stylesDefault.button(disabled), ...button }}
             onPress={() => {
                 if (onPress && typeof onPress === 'function') onPress()
                 if (navigateTo.name) setTimeout(() => navigation.navigate(navigateTo.name, navigateTo.data), timeoutNavigate)
@@ -32,18 +34,21 @@ const Button = ({
 };
 
 const stylesDefault = StyleSheet.create({
-    button: {
-        margin: 5,
-        padding: 15,
-        borderRadius: 10,
-        alignItems: 'center',
-        backgroundColor: Colors.blue,
-        minHeight: ScreenHeight * 0.06,
+    button: (disabled) => {
+        return {
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: disabled ? 0.4 : 1,
+            backgroundColor: Colors.blue,
+            minWidth: ScreenWidth * 0.35,
+            minHeight: ScreenHeight * 0.05,
+            borderRadius: ScreenWidth * 0.03,
+        }
     },
     buttonText: {
-        fontSize: 18,
         fontWeight: 'bold',
         color: Colors.white,
+        fontSize: ScreenWidth * 0.035,
     },
 });
 

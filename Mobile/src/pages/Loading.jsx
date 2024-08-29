@@ -8,9 +8,9 @@
 import Users from '../Data/Users';
 import MMKV from '../utils/MMKV/MMKV';
 
-import { StyleSheet } from 'react-native';
 import { useState, useEffect } from 'react';
 import { Colors } from '../utils/Stylization';
+import { StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 /**
@@ -72,17 +72,30 @@ const Loading = () => {
                 )
             }
 
-            const { success, user } = await Users.login(username, password)
-            setNameUser(user?.name || '')
+            try {
+                const { success, user } = await Users.login(username, password)
 
-            if (success) {
-                setValue(true, setIsLoggedIn);
-                await MMKV.set('userId', user.id);
-                await MMKV.set('lastLoggedInUser', username);
+                setNameUser(user?.name)
 
-            } else {
+                if (success) {
+                    setTimeout(async () => {
+                        setValue(true, setIsLoggedIn);
+                        await MMKV.set('userId', user.id);
+                        await MMKV.set('firstUserName', user.name);
+                        await MMKV.set('lastLoggedInUser', username);
+                    }, 250)
+
+                } else {
+                    setValue(
+                        { error: true, message: 'Usuário e/ou Senha incorretos' },
+                        setRequestLogin,
+                        true
+                    )
+                }
+            } catch (e) {
+                console.error(e)
                 setValue(
-                    { error: true, message: 'Usuário e/ou Senha incorretos' },
+                    { error: true, message: e.message },
                     setRequestLogin,
                     true
                 )
@@ -90,17 +103,17 @@ const Loading = () => {
         }
     }
 
+    const verifyIsLoggedIn = async () => {
+        const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
+        const { firstNameUser, tokenIsExpired: isLogged } = await Users.verifyIsLoggedIn(lastLoggedInUser)
 
+        setValue(isLogged, setIsLoggedIn)
+        setValue(firstNameUser, setNameUser)
+    }
 
-    useEffect(() => { }, [verifyingSession])
     useEffect(() => {
-        (async () => {
-            const lastLoggedInUser = await MMKV.find('lastLoggedInUser')
-            const isLogged = await Users.verifyIsLoggedIn(lastLoggedInUser)
-
-            setValue(isLogged, setIsLoggedIn)
-            return isLogged
-        })()
+        verifyIsLoggedIn()
+        return
     }, [])
 
 
@@ -116,65 +129,94 @@ const Loading = () => {
         }, 500);
 
         return () => clearTimeout(timer);
-
     }, [isLoggedIn, navigation])
 
     return (
-        <Container style={{ justifyContent: 'space-between' }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <Container style={styles.container}>
 
-            <Title style={{ marginTop: 50 }}>{!isLoggedIn ? 'Olá!' : `Olá, ${nameUser}!`}</Title>
-            <Text>{isLoggedIn ? 'Seja Bem-vindo!' : 'Bem-vindo de volta! Faça seu Login'}</Text>
+                <Title style={styles.title}>
+                    {isLoggedIn && nameUser !== '' ? `Olá, ${nameUser}!` : 'Olá!'}
+                </Title>
 
-            <Container style={styles.credentialContainer}>
-                {showCredentialEntry && (
-                    <>
-                        <Input
-                            label="Usuário"
-                            placeholder="Digite seu usuário"
-                            onChangeValue={(value) => setValue(value, setUsername)}
-                            style={[styles.input.default, requestLogin?.error && styles.input.error]}
-                        />
-                        <Input
-                            label="Senha"
-                            secureTextEntry={true}
-                            placeholder="Digite sua senha"
-                            onChangeValue={(value) => setValue(value, setPassword)}
-                            style={[styles.input.default, requestLogin?.error && styles.input.error]}
-                        />
+                <Text>
+                    {isLoggedIn && nameUser !== '' ? 'Bem-vindo de volta! Faça seu Login' : 'Seja Bem-vindo!'}
+                </Text>
 
-                        <Text
-                            style={{ color: Colors.red }}
-                        >
-                            {requestLogin?.message || ''}
-                        </Text>
+                <Container style={styles.credentialContainer}>
+                    {showCredentialEntry && (
+                        <>
+                            <Input
+                                label="Usuário"
+                                autoCapitalize={'none'}
+                                placeholder="Digite seu usuário"
+                                onChangeValue={(value) => setValue(value, setUsername)}
+                                style={[styles.input.default, requestLogin?.error && styles.input.error]}
+                            />
+                            <Input
+                                label="Senha"
+                                secureTextEntry={true}
+                                autoCapitalize={'none'}
+                                placeholder="Digite sua senha"
+                                onChangeValue={(value) => setValue(value, setPassword)}
+                                style={[styles.input.default, requestLogin?.error && styles.input.error]}
+                            />
 
-                        <Text style={{ fontSize: 14 }}>Ainda não possui conta? <Text onPress={() => navigation.navigate('SignUp')} style={{ color: Colors.blue, fontSize: 14 }}>Cadastre-se</Text></Text>
-                    </>
-                )}
+                            <Text style={styles.messageRequest}>{requestLogin?.message || ''}</Text>
+
+                            <Text style={styles.footerText}>
+                                Ainda não possui conta?
+                                <Text onPress={() => navigation.navigate('SignUp')} style={styles.footerRegisterText}> Cadastre-se</Text>
+                            </Text>
+                        </>
+                    )}
+
+                </Container>
+                <Button style={{ button: styles.actionButton }} onPress={startSession}>{actionButtonName}</Button >
 
             </Container>
-            <Button style={{ button: styles.actionButton }} onPress={startSession}>{actionButtonName}</Button >
-
-        </Container>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: ScreenWidth * 0.05,
+        justifyContent: 'space-between'
+    },
+    title: {
+        marginTop: ScreenHeight * 0.1,
+    },
     actionButton: {
-        marginBottom: 50,
-        width: ScreenWidth * 0.8
+        marginBottom: ScreenHeight * 0.1,
     },
     credentialContainer: {
-        paddingBottom: 100,
+        flex: 1,
         justifyContent: 'center',
+        paddingBottom: ScreenHeight * 0.1,
     },
     input: {
         default: {
-            marginTop: 10,
+            marginTop: ScreenHeight * 0.02,
         },
         error: {
-            // borderColor: Colors.red
+            borderColor: Colors.red
         },
+    },
+    messageRequest: {
+        color: Colors.red,
+        margin: ScreenHeight * 0.02,
+        fontSize: ScreenWidth * 0.03,
+        backgroundColor: Colors.transparent,
+    },
+    footerText: {
+        color: Colors.grey,
+        fontSize: ScreenWidth * 0.03,
+    },
+    footerRegisterText: {
+        color: Colors.blue,
+        fontSize: ScreenWidth * 0.03,
     },
 })
 

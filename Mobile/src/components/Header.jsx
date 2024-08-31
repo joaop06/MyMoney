@@ -54,8 +54,8 @@ const Header = ({
 
     useEffect(() => {
         const interval = setInterval(async () => {
-            const { rows: [userData] } = await Users.find('*', `WHERE Users.id = ${await MMKV.find('userId')}`)
-            setTotalBalance(userData.totalBalance)
+            const totalBalance = await Users.updateTotalBalance(await MMKV.find('userId'))
+            setTotalBalance(totalBalance)
         }, 1000);
 
         return () => clearInterval(interval)
@@ -73,6 +73,7 @@ const Header = ({
 
     const renderItem = ({ item, index }) => (
         <Button
+            key={item.id}
             onPress={() => handleMonthPress(index)}
             style={styles.buttonMonth(index, selectedMonth)}
         >
@@ -126,7 +127,6 @@ const Header = ({
                     scrollEnabled={false}
                     renderItem={renderItem}
                     style={styles.listMonths}
-                    keyExtractor={(item) => item.id}
                     getItemLayout={() => (
                         { length: ScreenWidth * 0.15, offset: ScreenWidth * 0.15, index: selectedMonth }
                     )}

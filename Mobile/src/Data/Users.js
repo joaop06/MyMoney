@@ -11,7 +11,7 @@ class Users extends CRUD {
 
     async create(username, object) {
         try {
-            const findUsername = await super.find('*', `WHERE username = '${username}'`)
+            const findUsername = await super.find('*', `WHERE u.username = '${username}'`)
             if (findUsername?.rows?.length > 0) {
                 throw new Error('Usuário já cadastrado')
             }
@@ -43,7 +43,7 @@ class Users extends CRUD {
 
     async login(username, password) {
         let success = false
-        let user = await super.find('*', `WHERE Users.username = '${username}' AND Users.password = '${password}'`)
+        let user = await super.find('*', `WHERE u.username = '${username}' AND u.password = '${password}'`)
 
         if (user.totalCount > 0) {
             user = user.rows[0]
@@ -53,7 +53,7 @@ class Users extends CRUD {
             const tokenExpiresAt = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
 
 
-            const where = `WHERE Users.id = ${user.id}`
+            const where = `WHERE u.id = ${user.id}`
             const fields = `tokenExpiresAt='${tokenExpiresAt}'`
 
             await super.update(fields, where)
@@ -67,7 +67,7 @@ class Users extends CRUD {
 
     async updateTotalBalance(userId) {
         try {
-            const releases = await Releases.find('*', `WHERE userId = ${userId}`)
+            const releases = await Releases.find('*', `WHERE r.userId = ${userId}`)
 
             let totalBalance = 0.00
             releases.rows.forEach(release => {
@@ -76,11 +76,11 @@ class Users extends CRUD {
             })
 
 
-            const where = `WHERE Users.id = ${userId}`
+            const where = `WHERE id = ${userId}`
             const fields = `totalBalance=${totalBalance}`
 
             await super.update(fields, where)
-            console.log(`Saldo Total atualizado: R$ ${totalBalance}`)
+            // console.log(`Saldo Total atualizado: R$ ${totalBalance}`)
 
             return totalBalance
 

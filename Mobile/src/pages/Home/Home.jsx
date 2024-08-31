@@ -42,12 +42,11 @@ const { screen: Spending, name: NameSpending } = require('./Spending');
 
 
 let selectedMonth = moment().month();
-export const fetchData = async typeRelease => {
+export const fetchData = async (typeRelease) => {
     if (
         process.env.FETCH_DATA_IN_PROGRESS != true &&
         process.env.LAST_FETCH_DATA !== typeRelease
     ) {
-        let data, total
         try {
             process.env.FETCH_DATA_IN_PROGRESS = true
 
@@ -93,16 +92,19 @@ export const fetchData = async typeRelease => {
                 return dateA - dateB;
             });
 
-            data = releasesSorted
-            total = totalRentsValue
+            const result = {
+                data: releasesSorted,
+                total: totalRentsValue
+            }
             process.env.LAST_FETCH_DATA = typeRelease
+
+            return result
 
         } catch (e) {
             console.error(e)
 
         } finally {
             process.env.FETCH_DATA_IN_PROGRESS = false
-            return { data, total }
         }
     }
 }

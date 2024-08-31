@@ -156,7 +156,7 @@ const EditRelease = ({ route }) => {
 
 
             // Atualiza os dados do Lançamento e Saldo Total
-            const where = `WHERE Releases.id = ${releaseData.id}`
+            const where = `WHERE r.id = ${releaseData.id}`
             const fields = `value=${parsedValue}, type='${newReleaseData.type}', title='${newReleaseData.title.trim()}', categoryId=${newReleaseData.categoryId}, description='${newReleaseData.description.trim()}', dateRelease='${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
 
             await Releases.update(fields, where)
@@ -174,8 +174,8 @@ const EditRelease = ({ route }) => {
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={{ flex: 1 }}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <ScrollView contentContainerStyle={{ flexGrow: 1, maxHeight: ScreenHeight * 0.9 }}>
                 {/* Confirmação de Exclusão */}
@@ -419,10 +419,22 @@ const styles = StyleSheet.create({
         }
     }),
     categorySelectorContainer: {
+        // width: ScreenWidth * 0.9,
+        // maxHeight: ScreenHeight * 0.2,
+        // marginTop: ScreenHeight * 0.02,
+        // backgroundColor: Colors.transparent,
+
+        elevation: 1,
+        borderWidth: 1,
+        overflow: 'hidden',
+        borderColor: Colors.blue,
         width: ScreenWidth * 0.9,
-        maxHeight: ScreenHeight * 0.2,
+        padding: ScreenWidth * 0.015,
+        maxHeight: ScreenHeight * 0.21,
         marginTop: ScreenHeight * 0.02,
-        backgroundColor: Colors.transparent,
+        borderRadius: ScreenWidth * 0.03,
+        backgroundColor: Colors.grey_lighten_2,
+
     },
     categorySelector: {
         flexWrap: 'wrap',
@@ -437,10 +449,11 @@ const styles = StyleSheet.create({
             backgroundColor: color,
             justifyContent: 'center',
             minWidth: ScreenWidth * 0.2,
+            maxWidth: ScreenWidth * 0.2,
             padding: ScreenHeight * 0.01,
             minHeight: ScreenHeight * 0.07,
-            marginHorizontal: ScreenWidth * 0.01,
             marginVertical: ScreenHeight * 0.01,
+            marginHorizontal: ScreenWidth * 0.01,
         }
     }),
     messageRequest: {
@@ -462,7 +475,8 @@ const styles = StyleSheet.create({
     actionsButton: (type) => ({
         button: {
             flex: 1,
-            borderWidth: 2,
+            opacity: 0.8,
+            borderWidth: 1,
             borderColor: Colors.blue,
             margin: ScreenWidth * 0.05,
             maxWidth: ScreenWidth * 0.35,

@@ -6,6 +6,7 @@ import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 const Button = ({
     children,
+    buttonKey,
     style = {},
     disabled = false,
     timeoutNavigate = 0,
@@ -17,6 +18,7 @@ const Button = ({
 
     return (
         <TouchableOpacity
+            key={buttonKey}
             disabled={disabled}
             style={{ ...stylesDefault.button(disabled), ...button }}
             onPress={() => {

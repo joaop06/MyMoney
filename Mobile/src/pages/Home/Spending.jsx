@@ -17,9 +17,11 @@ const Spending = () => {
     const [totalSpending, setTotalSpending] = useState(0.00);
 
     const fetchDataSpending = async () => {
-        const { data = [], total = 0.00 } = await fetchData('SPENDING');
-        setDataSpending(data)
-        setTotalSpending(total)
+        let allDataSpending = await fetchData('SPENDING');
+        if (!allDataSpending) allDataSpending = { data: [], total: 0.00 }
+
+        setDataSpending(allDataSpending?.data || [])
+        setTotalSpending(allDataSpending?.total || 0.00)
     }
 
     useEffect(() => {

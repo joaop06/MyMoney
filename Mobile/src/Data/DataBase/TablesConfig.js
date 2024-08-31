@@ -130,6 +130,37 @@ module.exports = {
                     type: 'DATETIME',
                 },
             }
+        },
+        {
+            name: 'TotalBalanceLogs',
+            attributes: {
+                id: {
+                    type: 'INTEGER',
+                    allowNull: false,
+                    primaryKey: true,
+                    autoIncrement: true,
+                },
+                userId: {
+                    type: 'INTEGER',
+                    allowNull: false,
+                },
+                value: {
+                    type: 'REAL',
+                    allowNull: true,
+                },
+                dateRelease: {
+                    type: 'DATETIME',
+                    allowNull: true,
+                },
+                createdAt: {
+                    allowNull: true,
+                    type: 'DATETIME',
+                },
+                updatedAt: {
+                    allowNull: true,
+                    type: 'DATETIME',
+                },
+            }
         }
     ]
 }

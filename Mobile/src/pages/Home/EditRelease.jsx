@@ -11,9 +11,10 @@ import Releases from "../../Data/Releases";
 import { useState, useEffect } from "react";
 import Categories from "../../Data/Categories";
 import { Colors } from '../../utils/Stylization';
-// import AllCategories from "../../utils/AllCategories";
 import { StyleSheet, ScrollView } from 'react-native';
+// import AllCategories from "../../utils/AllCategories";
 import { useNavigation } from '@react-navigation/native';
+import TotalBalanceLogs from "../../Data/TotalBalanceLogs";
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -156,13 +157,19 @@ const EditRelease = ({ route }) => {
 
 
             // Atualiza os dados do Lançamento e Saldo Total
-            const where = `WHERE r.id = ${releaseData.id}`
+            const where = `WHERE id = ${releaseData.id}`
             const fields = `value=${parsedValue}, type='${newReleaseData.type}', title='${newReleaseData.title.trim()}', categoryId=${newReleaseData.categoryId}, description='${newReleaseData.description.trim()}', dateRelease='${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
-
             await Releases.update(fields, where)
 
 
+            // Atualiza Saldo Total 
             totalBalance = await Users.updateTotalBalance(releaseData.userId);
+
+
+            // Insere Logs de Saldo Total
+            const fieldsTotal = `userId, value, dateRelease`
+            const valuesTotal = `${releaseData.userId}, ${totalBalance}, '${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+            await TotalBalanceLogs.create(fieldsTotal, valuesTotal)
 
             navigation.navigate('Home', { totalBalance });
 

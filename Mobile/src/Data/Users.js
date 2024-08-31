@@ -29,7 +29,7 @@ class Users extends CRUD {
         try {
             if (username === '') return false
 
-            let user = await super.find('*', `WHERE username = '${username}'`)
+            let user = await super.find('*', `WHERE u.username = '${username}'`)
             user = user?.rows[0]
 
             const tokenIsExpired = moment(user?.tokenExpiresAt || moment()) > moment()
@@ -53,7 +53,7 @@ class Users extends CRUD {
             const tokenExpiresAt = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
 
 
-            const where = `WHERE u.id = ${user.id}`
+            const where = `WHERE id = ${user.id}`
             const fields = `tokenExpiresAt='${tokenExpiresAt}'`
 
             await super.update(fields, where)
@@ -80,7 +80,6 @@ class Users extends CRUD {
             const fields = `totalBalance=${totalBalance}`
 
             await super.update(fields, where)
-            // console.log(`Saldo Total atualizado: R$ ${totalBalance}`)
 
             return totalBalance
 

@@ -28,7 +28,7 @@ const CardRelease = ({ item, navigateTo }) => {
 
 const styles = StyleSheet.create({
     button: {
-        elevation: 5,
+        elevation: 7,
         margin: 'auto',
         flexDirection: 'row',
         width: ScreenWidth * 0.8,

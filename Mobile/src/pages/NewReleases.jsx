@@ -12,6 +12,7 @@ import Releases from "../Data/Releases";
 import Categories from "../Data/Categories";
 import { Colors } from "../utils/Stylization";
 import { StyleSheet, ScrollView } from 'react-native';
+import TotalBalanceLogs from "../Data/TotalBalanceLogs";
 import { useState, useCallback, useEffect } from "react";
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
@@ -126,8 +127,15 @@ const NewReleases = () => {
             const values = `'${type}', '${title}', ${userId}, '${description}', ${parsedValue}, '${categoryRelease.id}', '${dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
             await Releases.create(fields, values)
 
-            // Atualiza Saldo Total e Redireciona para tela inicial
+            // Atualiza Saldo Total 
             const totalBalance = await Users.updateTotalBalance(userId);
+
+            // Insere Logs de Saldo Total
+            const fieldsTotal = `userId, value, dateRelease`
+            const valuesTotal = `${userId}, ${totalBalance}, '${dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+            await TotalBalanceLogs.create(fieldsTotal, valuesTotal)
+
+            // Redireciona para tela inicial
             navigation.navigate('Home', { totalBalance });
 
         } catch (e) {

@@ -18,22 +18,12 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, BackHandler, SafeAreaView } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-// import Carousel from 'react-native-snap-carousel';
 
 /** Components */
 import Alert from '../../components/Alert';
 import Header from '../../components/Header';
 import Container from '../../components/Container';
 
-const mapDaysWeek = {
-    "Sunday": "Domingo",
-    "Saturday": "Sábado",
-    "Friday": "Sexta-feira",
-    "Tuesday": "Terça-feira",
-    "Monday": "Segunda-feira",
-    "Thursday": "Quinta-feira",
-    "Wednesday": "Quarta-feira",
-};
 
 var navigation
 const config = {
@@ -52,11 +42,7 @@ const { screen: Spending, name: NameSpending } = require('./Spending');
 
 
 let selectedMonth = moment().month();
-export const fetchData = async (
-    typeRelease,
-    setDataReleases = () => { },
-    setTotalRelease = () => { }
-) => {
+export const fetchData = async typeRelease => {
     if (
         process.env.FETCH_DATA_IN_PROGRESS != true &&
         process.env.LAST_FETCH_DATA !== typeRelease
@@ -65,21 +51,21 @@ export const fetchData = async (
         try {
             process.env.FETCH_DATA_IN_PROGRESS = true
 
-            let { rows } = await Releases.find({
-                type: typeRelease,
-                userId: await MMKV.find('userId'),
-            })
+            const include = 'INNER JOIN Categories c ON r.categoryId = c.id'
+            const where = `WHERE r.type = '${typeRelease}' AND r.userId = ${await MMKV.find('userId')}`
+            const fields = 'r.id, r.value, r.title, r.userId, r.categoryId, r.description, r.type, r.dateRelease, r.createdAt, c.typeRelease, c.label, c.icon, c.color'
+            let { rows } = await Releases.find(fields, where, include)
+
             // Filtra os lançamentos do mês selecionado
             rows = rows.filter(release => moment(release.dateRelease).month() === selectedMonth)
 
 
             let totalRentsValue = 0.00
             const releasesGrouped = rows.reduce((acc, curr) => {
-
                 const dateRelease = moment.parseZone(curr.dateRelease ?? curr.createdAt);
 
-                const date = dateRelease.format('DD/MM')
-                const title = mapDaysWeek[dateRelease.format('dddd')]
+                const date = dateRelease.format('YYYY-MM-DD')
+                const title = dateRelease.format('dddd').replace(/(^|-)\w/g, match => match.toUpperCase())
 
                 const existDate = acc.findIndex(item => item.date === date)
                 if (existDate > -1) {
@@ -106,7 +92,6 @@ export const fetchData = async (
                 // Compara as datas
                 return dateA - dateB;
             });
-
 
             data = releasesSorted
             total = totalRentsValue
@@ -143,7 +128,7 @@ const Home = (data) => {
         if (firstUserName == '') getName()
 
         const getTotalBalance = async () => {
-            const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
+            const { rows: [userData] } = await Users.find('*', `WHERE u.id = ${await MMKV.find('userId')}`)
             setBalance(userData.totalBalance)
         }
         if (!totalBalance || totalBalance == 0) getTotalBalance()

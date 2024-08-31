@@ -1,12 +1,13 @@
+import moment from "moment";
 import { StyleSheet } from "react-native";
 import { useEffect, useState } from 'react';
 import { Colors } from '../../utils/Stylization';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 
 /** Components */
+import { fetchData } from './Home';
 import Div from '../../components/Div';
 import List from '../../components/List';
-import { fetchData } from './Home';
 import Text from '../../components/Text';
 import Container from '../../components/Container';
 import CardRelease from '../../components/CardRelease';
@@ -16,7 +17,7 @@ const Spending = () => {
     const [totalSpending, setTotalSpending] = useState(0.00);
 
     const fetchDataSpending = async () => {
-        const { data, total } = await fetchData('SPENDING');
+        const { data = [], total = 0.00 } = await fetchData('SPENDING');
         setDataSpending(data)
         setTotalSpending(total)
     }
@@ -25,7 +26,7 @@ const Spending = () => {
         fetchDataSpending()
     }, []);
     useEffect(() => {
-        const interval = setInterval(fetchDataSpending, 3000)
+        const interval = setInterval(fetchDataSpending, 1500)
         return () => clearInterval(interval)
     }, [dataSpending]);
 
@@ -34,7 +35,7 @@ const Spending = () => {
 
         return (
             <CardRelease
-                item={{ prefix: date, title, value }}
+                item={{ date: moment(date).format('DD/MM'), title, value }}
                 navigateTo={{ name: 'ReleasesGrouped', data: { date, dataList, totalValue: value, type: 'Despesas' } }}
             />
         )
@@ -54,7 +55,7 @@ const Spending = () => {
                 <List
                     data={dataSpending}
                     renderItem={renderItem}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item) => item.date}
                 />
             }
         </Container>

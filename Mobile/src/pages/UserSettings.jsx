@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, Text, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, Text, Button } from 'react-native';
 
 const config = { headerShown: false };
 

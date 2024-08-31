@@ -1,5 +1,4 @@
 import Text from './Text';
-// import { Text } from 'react-native'
 import { StyleSheet } from 'react-native';
 import { Colors } from '../utils/Stylization';
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';

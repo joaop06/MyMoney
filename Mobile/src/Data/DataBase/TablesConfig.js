@@ -1,5 +1,3 @@
-import moment from "moment";
-
 module.exports = {
     mapAttriburesType: {
         'string': ['TEXT'],
@@ -32,7 +30,6 @@ module.exports = {
                 totalBalance: {
                     type: 'REAL',
                     allowNull: true,
-                    defaultValue: 0.00,
                 },
                 tokenExpiresAt: {
                     allowNull: true,
@@ -41,12 +38,10 @@ module.exports = {
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
             }
         },
@@ -90,12 +85,10 @@ module.exports = {
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
             }
         },
@@ -108,7 +101,7 @@ module.exports = {
                     primaryKey: true,
                     autoIncrement: true,
                 },
-                type: {
+                typeRelease: {
                     type: 'TEXT',
                     allowNull: false,
                 },
@@ -131,12 +124,10 @@ module.exports = {
                 createdAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
                 updatedAt: {
                     allowNull: true,
                     type: 'DATETIME',
-                    defaultValue: 'CURRENT_TIMESTAMP'
                 },
             }
         }

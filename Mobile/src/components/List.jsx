@@ -30,12 +30,11 @@ const List = forwardRef(({
 
 const styles = StyleSheet.create({
     list: {
-        elevation: 2,
         borderRadius: 10,
         width: ScreenWidth * 0.9,
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
-        backgroundColor: Colors.grey_lighten_2,
+        backgroundColor: Colors.transparent,
     },
 });
 

@@ -6,8 +6,8 @@
  * 
 */
 import Users from '../Data/Users';
+import Categories from '../Data/Categories';
 import MMKV from '../utils/MMKV/MMKV';
-
 import { useState, useEffect } from 'react';
 import { Colors } from '../utils/Stylization';
 import { StyleSheet, ScrollView } from 'react-native';
@@ -24,12 +24,9 @@ import Container from '../components/Container';
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 
 
-
 const config = { headerShown: false };
 const Loading = () => {
     const navigation = useNavigation()
-
-
     const [isLoggedIn, setIsLoggedIn] = useState(null)
     const [requestLogin, setRequestLogin] = useState(null)
     const [verifyingSession, setVerifyingSession] = useState(true)

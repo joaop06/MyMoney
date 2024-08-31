@@ -1,4 +1,4 @@
-import RNFS from 'react-native-fs';
+import moment from "moment";
 import { tables as Tables } from './TablesConfig.js';
 import SQLiteStorage from 'react-native-sqlite-storage';
 
@@ -21,6 +21,12 @@ export default class SQLite {
                 (error) => console.error('Error opening database', error)
             );
 
+            if (false) {
+                await instance.executeQuery('DROP TABLE Users')
+                await instance.executeQuery('DROP TABLE Releases')
+                await instance.executeQuery('DROP TABLE Categories')
+            }
+
 
             Tables.forEach(async table => {
                 const { attributes } = table
@@ -39,10 +45,6 @@ export default class SQLite {
                     if (allowNull === false) sqlAttr += ' NOT NULL'
                     else sqlAttr += attribute.type === 'TEXT' ? '' : ' NULL'
 
-
-                    if (defaultValue !== undefined) {
-                        sqlAttr += typeof defaultValue === 'string' ? ` DEFAULT '${defaultValue}'` : ` DEFAULT ${defaultValue}`
-                    }
 
                     return sqlAttr
                 })
@@ -76,27 +78,33 @@ export default class SQLite {
 
                 const categories = await instance.executeQuery('SELECT * FROM Categories')
                 if (categories.rows.raw().length === 0) {
-                    await instance.executeQuery(`
-                        INSERT INTO Categories (type, name, label, icon, color)
-                        VALUES
-                        ('SPENDING', 'health', 'Saúde', 'heart-pulse', '#E53935'),
-                        ('SPENDING', 'leisure', 'Lazer', 'pinwheel-outline', '#1E88E5'),
-                        ('SPENDING', 'home', 'Casa', 'home-outline', '#43A047'),
-                        ('SPENDING', 'meals', 'Refeições', 'silverware-variant', '#FB8C00'),
-                        ('SPENDING', 'education', 'Educação', 'school-outline', '#8E24AA'),
-                        ('SPENDING', 'gifts', 'Presentes', 'gift-outline', '#D81B60'),
-                        ('SPENDING', 'transportation', 'Transporte', 'taxi', '#FDD835'),
-                        ('SPENDING', 'others', 'Outros', 'help-circle-outline', '#757575'),
-                        ('RENTS', 'salary', 'Salário', 'cash-multiple', '#43A047'),
-                        ('RENTS', 'freelance', 'Freelance', 'account-cash-outline', '#1E88E5'),
-                        ('RENTS', 'investments', 'Investimentos', 'chart-areaspline', '#8E24AA'),
-                        ('RENTS', 'rent', 'Aluguel', 'home-city-outline', '#FDD835'),
-                        ('RENTS', 'sales', 'Vendas', 'cash-register', '#FB8C00'),
-                        ('RENTS', 'gifts', 'Presentes', 'gift-open-outline', '#D81B60'),
-                        ('RENTS', 'awards', 'Prêmios', 'trophy-variant-outline', '#FFD700'),
-                        ('RENTS', 'others', 'Outros', 'help-circle-outline', '#757575')
-                    `)
-                    console.log('Categorias Inseridas')
+                    try {
+                        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+
+                        await instance.executeQuery(`
+                            INSERT INTO Categories (typeRelease, name, label, icon, color, createdAt, updatedAt)
+                            VALUES
+                            ('SPENDING', 'health', 'Saúde', 'heart-pulse', '#E53935', '${now}', '${now}'),
+                            ('SPENDING', 'leisure', 'Lazer', 'pinwheel-outline', '#1E88E5', '${now}', '${now}'),
+                            ('SPENDING', 'home', 'Casa', 'home-outline', '#43A047', '${now}', '${now}'),
+                            ('SPENDING', 'meals', 'Refeições', 'silverware-variant', '#FB8C00', '${now}', '${now}'),
+                            ('SPENDING', 'education', 'Educação', 'school-outline', '#8E24AA', '${now}', '${now}'),
+                            ('SPENDING', 'gifts', 'Presentes', 'gift-outline', '#D81B60', '${now}', '${now}'),
+                            ('SPENDING', 'transportation', 'Transporte', 'taxi', '#FDD835', '${now}', '${now}'),
+                            ('SPENDING', 'others', 'Outros', 'help-circle-outline', '#757575', '${now}', '${now}'),
+                            ('RENTS', 'salary', 'Salário', 'cash-multiple', '#43A047', '${now}', '${now}'),
+                            ('RENTS', 'freelance', 'Freelance', 'account-cash-outline', '#1E88E5', '${now}', '${now}'),
+                            ('RENTS', 'investments', 'Investimentos', 'chart-areaspline', '#8E24AA', '${now}', '${now}'),
+                            ('RENTS', 'rent', 'Aluguel', 'home-city-outline', '#FDD835', '${now}', '${now}'),
+                            ('RENTS', 'sales', 'Vendas', 'cash-register', '#FB8C00', '${now}', '${now}'),
+                            ('RENTS', 'gifts', 'Presentes', 'gift-open-outline', '#D81B60', '${now}', '${now}'),
+                            ('RENTS', 'awards', 'Prêmios', 'trophy-variant-outline', '#FFD700', '${now}', '${now}'),
+                            ('RENTS', 'others', 'Outros', 'help-circle-outline', '#757575', '${now}', '${now}')
+                        `)
+                        console.log('Categorias Inseridas')
+                    } catch (e) {
+                        console.error('Aconteceu alguma coisa ao inserir catagorias: ', e)
+                    }
                 }
             }, 2000);
 

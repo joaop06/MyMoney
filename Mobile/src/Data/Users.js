@@ -3,19 +3,21 @@ import Releases from "./Releases";
 import CRUD from "./DataBase/CRUD";
 
 class Users extends CRUD {
-    constructor(tableName) {
-        super(tableName)
+    constructor(tableName, tableNameAbbreviated) {
+        super(tableName, tableNameAbbreviated)
         this.tableName = tableName;
+        this.tableNameAbbreviated = tableNameAbbreviated;
     }
 
-    async create(object) {
+    async create(username, object) {
         try {
-            const findUsername = await super.find({ username: object.username })
+            const findUsername = await super.find('*', `WHERE username = '${username}'`)
             if (findUsername?.rows?.length > 0) {
                 throw new Error('Usuário já cadastrado')
             }
 
-            return await super.create(object)
+            const { fields, values } = object
+            return await super.create(fields, values)
 
         } catch (e) {
             console.error(e)
@@ -27,12 +29,12 @@ class Users extends CRUD {
         try {
             if (username === '') return false
 
-            let user = await super.find({ username })
-            user = user.rows[0]
+            let user = await super.find('*', `WHERE username = '${username}'`)
+            user = user?.rows[0]
 
             const tokenIsExpired = moment(user?.tokenExpiresAt || moment()) > moment()
 
-            return { firstNameUser: user.name, tokenIsExpired }
+            return { firstNameUser: user?.name, tokenIsExpired }
 
         } catch (e) {
             console.error('Erro ao verificar usuário logado', e)
@@ -41,7 +43,7 @@ class Users extends CRUD {
 
     async login(username, password) {
         let success = false
-        let user = await super.find({ username, password })
+        let user = await super.find('*', `WHERE Users.username = '${username}' AND Users.password = '${password}'`)
 
         if (user.totalCount > 0) {
             user = user.rows[0]
@@ -50,7 +52,11 @@ class Users extends CRUD {
             now.add(now.days() + 1, 'days')
             const tokenExpiresAt = now.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
 
-            await super.update({ tokenExpiresAt: `${tokenExpiresAt}` }, { id: user.id })
+
+            const where = `WHERE Users.id = ${user.id}`
+            const fields = `tokenExpiresAt='${tokenExpiresAt}'`
+
+            await super.update(fields, where)
 
             success = true
             return { success, user }
@@ -61,7 +67,7 @@ class Users extends CRUD {
 
     async updateTotalBalance(userId) {
         try {
-            const releases = await Releases.find({ userId })
+            const releases = await Releases.find('*', `WHERE userId = ${userId}`)
 
             let totalBalance = 0.00
             releases.rows.forEach(release => {
@@ -69,8 +75,11 @@ class Users extends CRUD {
                 else if (release.type === 'SPENDING') totalBalance -= release.value
             })
 
-            await super.update({ totalBalance }, { id: userId })
 
+            const where = `WHERE Users.id = ${userId}`
+            const fields = `totalBalance=${totalBalance}`
+
+            await super.update(fields, where)
             console.log(`Saldo Total atualizado: R$ ${totalBalance}`)
 
             return totalBalance
@@ -81,4 +90,4 @@ class Users extends CRUD {
     }
 }
 
-export default new Users('Users');
+export default new Users('Users', 'Users u');

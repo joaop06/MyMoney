@@ -4,22 +4,30 @@ import Container from "./Container";
 import { StyleSheet } from "react-native";
 import { Colors } from "../utils/Stylization";
 import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CardRelease = ({ item, navigateTo }) => {
-    const { date, title, value } = item
+const CardReleaseGrouped = ({ item, navigateTo }) => {
+    const { iconName, title, subtitle, value, icon, color } = item
 
     return (
         <Button style={{ button: styles.button }} navigateTo={navigateTo} >
 
             <Container style={styles.containerIcon}>
-                <Text style={styles.prefixAndSulfix}>{date}</Text>
+                <MaterialCommunityIcons
+                    name={icon ?? iconName}
+                    color={color ?? Colors.white}
+                    size={ScreenHeight * 0.035}
+                />
             </Container>
 
-            <Text numberOfLines={1} style={styles.title}>{title}</Text>
+            <Container style={styles.containerText}>
+                <Text numberOfLines={1} style={styles.title}>{title}</Text>
+                <Text style={styles.subtitle}>{subtitle}</Text>
+            </Container>
 
             <Container style={styles.containerPrice}>
                 <Text style={styles.prefixAndSulfix}>
-                    R$ {value.toFixed(2).replace('.', ',')}
+                    R$ {(value ?? '').toFixed(2).replace('.', ',')}
                 </Text>
             </Container>
         </Button>
@@ -31,18 +39,18 @@ const styles = StyleSheet.create({
         elevation: 5,
         margin: 'auto',
         flexDirection: 'row',
-        width: ScreenWidth * 0.8,
+        width: ScreenWidth * 0.75,
         padding: ScreenHeight * 0.01,
+        backgroundColor: Colors.white,
         maxHeight: ScreenHeight * 0.055,
         justifyContent: 'space-between',
         marginTop: ScreenHeight * 0.015,
-        backgroundColor: Colors.blue_lighten_1,
     },
     containerIcon: {
         height: ScreenHeight,
         alignItems: 'flex-start',
         justifyContent: 'center',
-        maxWidth: ScreenWidth * 0.2,
+        maxWidth: ScreenWidth * 0.15,
         maxHeight: ScreenHeight * 0.05,
         backgroundColor: Colors.transparent,
     },
@@ -56,12 +64,12 @@ const styles = StyleSheet.create({
     },
     title: {
         marginBottom: 0,
-        color: Colors.white,
-        fontSize: ScreenWidth * 0.04,
+        color: Colors.grey_darken,
+        fontSize: ScreenWidth * 0.033,
     },
-    category: {
+    subtitle: {
         marginTop: 2,
-        color: Colors.white,
+        color: Colors.grey,
         fontSize: ScreenWidth * 0.03,
     },
     containerPrice: {
@@ -73,10 +81,10 @@ const styles = StyleSheet.create({
     },
     prefixAndSulfix: {
         marginBottom: 0,
-        color: Colors.white,
+        color: Colors.blue,
         alignContent: 'center',
-        fontSize: ScreenWidth * 0.035,
+        fontSize: ScreenWidth * 0.03,
     },
 })
 
-export default CardRelease;
+export default CardReleaseGrouped;

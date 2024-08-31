@@ -8,7 +8,15 @@
 import moment from "moment";
 import Users from "../../Data/Users";
 import Releases from "../../Data/Releases";
+import { useState, useEffect } from "react";
 import Categories from "../../Data/Categories";
+import { Colors } from '../../utils/Stylization';
+// import AllCategories from "../../utils/AllCategories";
+import { StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { KeyboardAvoidingView, Platform } from 'react-native';
+import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import Div from "../../components/Div";
 import Text from "../../components/Text";
@@ -21,13 +29,6 @@ import Calendar from "../../components/Calendar";
 import TextArea from "../../components/TextArea";
 import Container from "../../components/Container";
 import InputMask from "../../components/InputMask";
-
-import { useState, useEffect } from "react";
-import { Colors } from '../../utils/Stylization';
-import { StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const config = { headerShown: false };
@@ -52,7 +53,6 @@ const EditRelease = ({ route }) => {
     const [requestNewRelease, setRequestNewRelease] = useState(null)
     const [calendarVisibility, setCalendarVisibility] = useState(false);
     const [optionsToSelect, setOptionsToSelect] = useState([{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }])
-    // const optionsToSelect = [{ name: 'Renda', origin: 'RENTS' }, { name: 'Despesa', origin: 'SPENDING' }]
 
 
     /**
@@ -62,10 +62,10 @@ const EditRelease = ({ route }) => {
         const { rows } = await Categories.find()
         setAllCategories(rows)
 
-
         // Busca dados da Categoria atual do Lançamento
-        const selectedCategory = rows.find(item => {
-            return item.id == releaseData.categoryId || (item.type === releaseData.type && item.name === 'Outros')
+        const selectedCategory = rows.find(category => {
+            // Caso não tenha categoria, seleciona 'Outros' por padrão
+            return category.id == releaseData.categoryId || (category.typeRelease === releaseData.type && category.name === 'Outros')
         })
         setCategoryRelease(selectedCategory)
     }
@@ -75,7 +75,7 @@ const EditRelease = ({ route }) => {
     }, [])
 
     const getCategoriesByType = (typeRelease) => {
-        return allCategories.filter(category => category.type === typeRelease)
+        return allCategories.filter(category => category.typeRelease === typeRelease)
     };
 
 
@@ -123,8 +123,9 @@ const EditRelease = ({ route }) => {
         setValueOnNewReleaseData('type', releaseData.type)
         setValueOnNewReleaseData('categoryId', releaseData.categoryId)
 
-        const selectedCategory = allCategories.find(item => {
-            return item.id == releaseData.categoryId || (item.type === releaseData.type && item.name === 'Outros')
+        const selectedCategory = allCategories.find(category => {
+            // Caso não tenha categoria, seleciona 'Outros' por padrão
+            return category.id == releaseData.categoryId || (category.typeRelease === releaseData.type && category.name === 'Outros')
         })
         setCategoryRelease(selectedCategory)
         setOptionsToSelect(optionsToSelect)
@@ -153,20 +154,15 @@ const EditRelease = ({ route }) => {
             if (typeof newReleaseData.value === 'number') parsedValue = newReleaseData.value
             else parsedValue = parseFloat(newReleaseData.value.replace('R$ ', '').replaceAll('.', '').replace(',', '.') || 0.00);
 
-            const releaseToUpdate = {
-                value: parsedValue,
-                id: newReleaseData.id,
-                type: newReleaseData.type,
-                userId: newReleaseData.userId,
-                title: newReleaseData.title.trim(),
-                categoryId: newReleaseData.categoryId,
-                description: newReleaseData.description.trim(),
-                dateRelease: newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
-            }
 
             // Atualiza os dados do Lançamento e Saldo Total
-            await Releases.update(releaseToUpdate, { id: releaseToUpdate.id })
-            totalBalance = await Users.updateTotalBalance(newReleaseData.userId);
+            const where = `WHERE Releases.id = ${releaseData.id}`
+            const fields = `value=${parsedValue}, type='${newReleaseData.type}', title='${newReleaseData.title.trim()}', categoryId=${newReleaseData.categoryId}, description='${newReleaseData.description.trim()}', dateRelease='${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+
+            await Releases.update(fields, where)
+
+
+            totalBalance = await Users.updateTotalBalance(releaseData.userId);
 
             navigation.navigate('Home', { totalBalance });
 
@@ -177,154 +173,159 @@ const EditRelease = ({ route }) => {
     }
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1, maxHeight: ScreenHeight * 0.9 }}>
-            {/* Confirmação de Exclusão */}
-            <Alert
-                onCancel={hideAlertDelete}
-                onConfirm={handleDeleteRelease}
-                isVisible={isAlertDeleteVisible}
-                content={{ title: `Excluir ${releaseData.title}?`, cancel: 'Cancelar', confirm: 'Excluir' }}
-            />
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{ flex: 1 }}
+        >
+            <ScrollView contentContainerStyle={{ flexGrow: 1, maxHeight: ScreenHeight * 0.9 }}>
+                {/* Confirmação de Exclusão */}
+                <Alert
+                    onCancel={hideAlertDelete}
+                    onConfirm={handleDeleteRelease}
+                    isVisible={isAlertDeleteVisible}
+                    content={{ title: `Excluir ${releaseData.title}?`, cancel: 'Cancelar', confirm: 'Excluir' }}
+                />
 
 
 
-            <Container style={styles.container}>
+                <Container style={styles.container}>
 
-                <Title style={styles.title}>{releaseData.title}</Title>
+                    <Title style={styles.title}>{releaseData.title}</Title>
 
 
-                <Container style={styles.containerSelector}>
-                    {optionsToSelect.map((option, index) => (
-                        <Button
-                            key={index}
+                    <Container style={styles.containerSelector}>
+                        {optionsToSelect.map((option, index) => (
+                            <Button
+                                key={index}
+                                disabled={!editable}
+                                onPress={() => {
+                                    setValueOnNewReleaseData('type', option.origin)
+                                    if (releaseData.type !== option.origin) setCategoryRelease('')
+                                }}
+                                style={{
+                                    button: styles.buttonTypeRelease(newReleaseData.type, option.origin),
+                                    text: styles.buttonTypeTextRelease(newReleaseData.type, option.origin)
+                                }}
+                            >
+                                {option.name}
+                            </Button>
+                        ))}
+                    </Container>
+
+                    <Container style={styles.containerDateAndValue}>
+                        <InputMask
+                            type="money"
+                            label="Valor *"
+                            editable={editable}
+                            inputMode="decimal"
+                            placeholder="Ex: R$ 100,00"
+                            style={styles.valueRelease}
+                            value={newReleaseData.value}
+                            onChangeValue={(value) => setValueOnNewReleaseData('value', value)}
+                            options={{
+                                unit: 'R$ ',
+                                precision: 2,
+                                separator: ',',
+                                suffixUnit: '',
+                            }}
+                        />
+
+                        <Input
+                            label="Data"
+                            inputMode="decimal"
                             disabled={!editable}
-                            onPress={() => {
-                                setValueOnNewReleaseData('type', option.origin)
-                                if (releaseData.type !== option.origin) setCategoryRelease('')
-                            }}
-                            style={{
-                                button: styles.buttonTypeRelease(newReleaseData.type, option.origin),
-                                text: styles.buttonTypeTextRelease(newReleaseData.type, option.origin)
-                            }}
-                        >
-                            {option.name}
-                        </Button>
-                    ))}
-                </Container>
+                            style={styles.dateRelease}
+                            value={newReleaseData.dateRelease.format('DD/MM/YYYY')}
+                            onFocus={() => setCalendarVisibility(true)}
+                            onBlur={() => setCalendarVisibility(false)}
+                        />
 
-                <Container style={styles.containerDateAndValue}>
-                    <InputMask
-                        type="money"
-                        label="Valor *"
-                        editable={editable}
-                        inputMode="decimal"
-                        placeholder="Ex: R$ 100,00"
-                        style={styles.valueRelease}
-                        value={newReleaseData.value}
-                        onChangeValue={(value) => setValueOnNewReleaseData('value', value)}
-                        options={{
-                            unit: 'R$ ',
-                            precision: 2,
-                            separator: ',',
-                            suffixUnit: '',
-                        }}
-                    />
+                        <Calendar
+                            isVisible={calendarVisibility}
+                            date={newReleaseData.dateRelease}
+                            hideDatePicker={() => setCalendarVisibility(false)}
+                            handleConfirm={selectedDate => {
+                                setCalendarVisibility(false)
+                                selectedDate = moment(selectedDate)
+                                setValueOnNewReleaseData('dateRelease', selectedDate)
+                            }}
+                        />
+                    </Container>
+
 
                     <Input
-                        label="Data"
-                        inputMode="decimal"
+                        label="Título *"
                         disabled={!editable}
-                        style={styles.dateRelease}
-                        value={newReleaseData.dateRelease.format('DD/MM/YYYY')}
-                        onFocus={() => setCalendarVisibility(true)}
-                        onBlur={() => setCalendarVisibility(false)}
+                        style={styles.titleRelease}
+                        value={newReleaseData.title}
+                        placeholder="Título do lançamento"
+                        onChangeValue={(title) => setValueOnNewReleaseData('title', title)}
                     />
 
-                    <Calendar
-                        isVisible={calendarVisibility}
-                        date={newReleaseData.dateRelease}
-                        hideDatePicker={() => setCalendarVisibility(false)}
-                        handleConfirm={selectedDate => {
-                            setCalendarVisibility(false)
-                            selectedDate = moment(selectedDate)
-                            setValueOnNewReleaseData('dateRelease', selectedDate)
-                        }}
+                    <Label style={styles.labelDescription(editable)}>Descrição</Label>
+                    <TextArea
+                        editable={editable}
+                        style={styles.description}
+                        value={newReleaseData.description}
+                        onChangeValue={(description) => setValueOnNewReleaseData('description', description)}
+                        placeholder={`Descrição sobre esta ${releaseData.type.includes('SPENDING') ? 'despesa' : 'renda'}`}
                     />
-                </Container>
 
 
-                <Input
-                    label="Título *"
-                    disabled={!editable}
-                    style={styles.titleRelease}
-                    value={newReleaseData.title}
-                    placeholder="Título do lançamento"
-                    onChangeValue={(title) => setValueOnNewReleaseData('title', title)}
-                />
-
-                <Label style={styles.labelDescription(editable)}>Descrição</Label>
-                <TextArea
-                    editable={editable}
-                    style={styles.description}
-                    value={newReleaseData.description}
-                    onChangeValue={(description) => setValueOnNewReleaseData('description', description)}
-                    placeholder={`Descrição sobre esta ${releaseData.type.includes('SPENDING') ? 'despesa' : 'renda'}`}
-                />
-
-
-                {/*************** Categorias ***************/}
-                <Button
-                    disabled={!editable}
-                    style={styles.selectCategoryButton(categoryRelease, !editable)}
-                >
-                    {categoryRelease ? categoryRelease.label : 'Selecione uma Categoria *'}
-                </Button>
-
-                {editable ?
-                    <Div style={styles.categorySelectorContainer}>
-                        <ScrollView contentContainerStyle={styles.categorySelector}>
-                            {getCategoriesByType(newReleaseData.type).map(category => (
-                                <Button
-                                    key={category.id}
-                                    disabled={!editable}
-                                    style={styles.categoryOption(category.color)}
-                                    onPress={() => {
-                                        setCategoryRelease(category)
-                                        setValueOnNewReleaseData('categoryId', category.id)
-                                    }}
-                                >
-                                    <MaterialCommunityIcons name={category.icon} color="white" size={ScreenHeight * 0.04} />
-                                    <Text style={{ fontWeight: 'bold', fontSize: ScreenWidth * 0.022, color: 'white' }}>{category.label}</Text>
-                                </Button>
-                            ))}
-                        </ScrollView>
-                    </Div>
-                    :
-                    <Div name="phantomDiv" style={styles.phantomDiv}></Div>
-                }
-
-
-                <Text style={styles.messageRequest}>{requestNewRelease?.message || ''}</Text>
-
-                <Container style={styles.containerButtons}>
-                    <Button onPress={() => {
-                        if (editable) {
-                            resetInitialState()
-                        } else {
-                            showAlertDelete()
-                        }
-                    }}
-                        style={styles.actionsButton('delete')}
+                    {/*************** Categorias ***************/}
+                    <Button
+                        disabled={!editable}
+                        style={styles.selectCategoryButton(categoryRelease, !editable)}
                     >
-                        {editable ? 'Cancelar' : 'Excluir'}
+                        {categoryRelease ? categoryRelease.label : 'Selecione uma Categoria *'}
                     </Button>
-                    <Button onPress={editable ? handleEditRelease : () => { setEditable(true) }} style={styles.actionsButton('update')}>
-                        {editable ? 'Salvar' : 'Editar'}
-                    </Button>
-                </Container>
 
-            </Container>
-        </ScrollView>
+                    {editable ?
+                        <Div style={styles.categorySelectorContainer}>
+                            <ScrollView contentContainerStyle={styles.categorySelector}>
+                                {getCategoriesByType(newReleaseData.type).map(category => (
+                                    <Button
+                                        key={category.id}
+                                        disabled={!editable}
+                                        style={styles.categoryOption(category.color)}
+                                        onPress={() => {
+                                            setCategoryRelease(category)
+                                            setValueOnNewReleaseData('categoryId', category.id)
+                                        }}
+                                    >
+                                        <MaterialCommunityIcons name={category.icon} color="white" size={ScreenHeight * 0.04} />
+                                        <Text style={{ fontWeight: 'bold', fontSize: ScreenWidth * 0.022, color: 'white' }}>{category.label}</Text>
+                                    </Button>
+                                ))}
+                            </ScrollView>
+                        </Div>
+                        :
+                        <Div name="phantomDiv" style={styles.phantomDiv}></Div>
+                    }
+
+
+                    <Text style={styles.messageRequest}>{requestNewRelease?.message || ''}</Text>
+
+                    <Container style={styles.containerButtons}>
+                        <Button onPress={() => {
+                            if (editable) {
+                                resetInitialState()
+                            } else {
+                                showAlertDelete()
+                            }
+                        }}
+                            style={styles.actionsButton('delete')}
+                        >
+                            {editable ? 'Cancelar' : 'Excluir'}
+                        </Button>
+                        <Button onPress={editable ? handleEditRelease : () => { setEditable(true) }} style={styles.actionsButton('update')}>
+                            {editable ? 'Salvar' : 'Editar'}
+                        </Button>
+                    </Container>
+
+                </Container>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: ScreenWidth * 0.8,
         justifyContent: 'space-between',
-        marginVertical: ScreenHeight * 0.02,
+        marginVertical: ScreenHeight * 0.04,
         backgroundColor: Colors.transparent,
     },
     buttonTypeRelease: (type, origin) => ({
@@ -368,7 +369,7 @@ const styles = StyleSheet.create({
         width: ScreenWidth * 0.8,
         justifyContent: 'space-between',
         backgroundColor: Colors.transparent,
-        marginVertical: ScreenHeight * 0.015,
+        marginVertical: ScreenHeight * 0.02,
     },
     dateRelease: {
         width: ScreenWidth * 0.35,

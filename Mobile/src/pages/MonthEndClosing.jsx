@@ -3,7 +3,7 @@ import { Colors } from '../utils/Stylization';
 import Container from '../components/Container';
 import { ScreenHeight } from '../utils/Dimensions';
 import { useNavigation } from '@react-navigation/native';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 /**
  * ***** Tela de Fechamento do Mês *****

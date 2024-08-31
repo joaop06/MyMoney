@@ -1,4 +1,3 @@
-import Input from './Input';
 import React, { useState } from 'react';
 import { Colors } from '../utils/Stylization';
 import { TextInput, StyleSheet } from 'react-native';
@@ -30,17 +29,6 @@ const TextArea = ({
             placeholderTextColor={placeholderColor}
             style={[styles.textArea(editable, isFocused), style]}
         />
-        // <Input
-        //     label={label}
-        //     value={value}
-        //     mode='outlined'
-        //     multiline={true}
-        //     disabled={disabled}
-        //     placeholder={placeholder}
-        //     onChangeText={onChangeValue}
-        //     numberOfLines={numberOfLines}
-        //     style={styles.textArea(disabled, isFocused)}
-        // />
     )
 }
 

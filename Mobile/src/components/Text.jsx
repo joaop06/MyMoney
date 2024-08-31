@@ -1,7 +1,7 @@
 import React from 'react';
 import { Colors } from '../utils/Stylization';
+import { ScreenWidth } from '../utils/Dimensions';
 import { Text as TextNative, StyleSheet } from 'react-native';
-import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 
 const Text = ({
     children,

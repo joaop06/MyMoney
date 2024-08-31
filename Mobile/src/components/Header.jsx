@@ -1,3 +1,5 @@
+import Users from '../Data/Users';
+import MMKV from '../utils/MMKV/MMKV';
 import { Colors } from '../utils/Stylization';
 import { StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -12,8 +14,6 @@ import Title from './Title';
 import Button from './Button';
 import Container from './Container';
 
-import Users from '../Data/Users';
-import MMKV from '../utils/MMKV/MMKV';
 
 const months = [
     { id: 0, label: 'Janeiro' },
@@ -54,8 +54,7 @@ const Header = ({
 
     useEffect(() => {
         const interval = setInterval(async () => {
-            const { rows: [userData] } = await Users.find({ id: await MMKV.find('userId') })
-            console.log('Buscando Saldo Total: R$', userData.totalBalance)
+            const { rows: [userData] } = await Users.find('*', `WHERE Users.id = ${await MMKV.find('userId')}`)
             setTotalBalance(userData.totalBalance)
         }, 1000);
 

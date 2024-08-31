@@ -1,5 +1,4 @@
 import Text from '../components/Text';
-import Title from '../components/Title';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import Container from '../components/Container';
@@ -7,9 +6,9 @@ import Container from '../components/Container';
 import { useState } from 'react';
 import Users from '../Data/Users';
 import { Colors } from "../utils/Stylization";
+import { ScreenHeight } from '../utils/Dimensions';
 import { StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { ScreenWidth, ScreenHeight } from '../utils/Dimensions';
 
 
 const config = { headerShown: false };
@@ -41,7 +40,10 @@ const SignUp = () => {
         }
 
         try {
-            await Users.create({ name, username, password })
+            const fields = `name, username, password`
+            const values = `'${name}', '${username}', '${password}'`
+            await Users.create(username, { fields, values })
+
             navigation.navigate('Loading')
 
         } catch (e) {

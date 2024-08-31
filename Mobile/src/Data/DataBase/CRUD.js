@@ -3,9 +3,10 @@ import SQLite from './SQLite';
 import { tables as Tables } from './TablesConfig.js';
 
 export default class CRUD extends SQLite {
-    constructor(tableName) {
-        super(tableName)
-        this.tableName = tableName
+    constructor(tableName, tableNameAbbreviated) {
+        super(tableName, tableNameAbbreviated)
+        this.tableName = tableName;
+        this.tableNameAbbreviated = tableNameAbbreviated;
     }
 
     treatTableAttrsOnSql(object, options = {}) {
@@ -37,10 +38,24 @@ export default class CRUD extends SQLite {
         }
     }
 
-    async find(where = {}) {
+    async find(fields = '*', where, include) {
         try {
-            const whereClause = this.treatTableAttrsOnSql(where, { joinWith: ' AND ' })
-            const result = await super.executeQuery(`SELECT * FROM ${this.tableName} ${whereClause ? 'WHERE ' + whereClause : ''}`)
+            let sqlSelect
+            if (where && include) {
+                sqlSelect = `SELECT ${fields} FROM ${this.tableNameAbbreviated} ${include} ${where}`
+
+            } else if (include) {
+                sqlSelect = `SELECT ${fields} FROM ${this.tableNameAbbreviated} ${include}`
+
+            } else if (where) {
+                sqlSelect = `SELECT ${fields} FROM ${this.tableNameAbbreviated} ${where}`
+
+            } else {
+                sqlSelect = `SELECT ${fields} FROM ${this.tableNameAbbreviated}`
+            }
+
+
+            const result = await super.executeQuery(sqlSelect)
 
             return {
                 rows: result.rows.raw(),
@@ -52,28 +67,20 @@ export default class CRUD extends SQLite {
         }
     }
 
-    async create(object) {
-        const objectAttributes = Object.keys(object)
-        const fieldsToCreate = this.treatTableAttrsOnSql(object, { joinWith: ',', onlyValue: true })
+    async create(fields, values) {
+        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+        const sqlCreate = `INSERT INTO ${this.tableName} (${fields}, createdAt, updatedAt) VALUES (${values}, '${now}', '${now}')`
 
-        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
-        const sqlCreate = `
-            INSERT INTO ${this.tableName} (${objectAttributes},createdAt,updatedAt)
-            VALUES (${fieldsToCreate},'${now}','${now}')
-        `
         return await super.executeQuery(sqlCreate)
     }
 
-    async update(object, where = {}) {
-        const whereClause = this.treatTableAttrsOnSql(where, { joinWith: ' AND ' })
-        const fieldsToUpdate = this.treatTableAttrsOnSql(object, { joinWith: ',' })
-        if (fieldsToUpdate === '') return
+    async update(fields, where) {
+        if (!fields || !where) throw new Error('Campos ou Condições não informadas')
 
-        return await super.executeQuery(`
-            UPDATE ${this.tableName}
-            SET ${fieldsToUpdate}, updatedAt = '${moment()}'
-            WHERE ${whereClause}
-        `)
+        const now = moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')
+        const sqlUpdate = `UPDATE ${this.tableName} SET ${fields}, updatedAt = '${now}' ${where}`
+
+        return await super.executeQuery(sqlUpdate)
     }
 
     async delete(id) {

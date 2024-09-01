@@ -84,17 +84,19 @@ const Header = ({
     return (
         <Container style={styles.container}>
             <Div style={styles.firstLine}>
-                <Button
-                    style={styles.buttonUserSettings}
-                    onPress={() => navigation.navigate('UserSettings')}
-                >
-                    <Image
-                        style={styles.profileImage}
-                        source={profilePicture ? { uri: profilePicture } : require('../utils/pictures/default-profile-picture.jpg')}
-                    />
-                </Button>
+                <Div>
+                    <Button
+                        style={styles.buttonUserSettings}
+                        onPress={() => navigation.navigate('UserSettings')}
+                    >
+                        <Image
+                            style={styles.profileImage}
+                            source={profilePicture ? { uri: profilePicture } : require('../utils/pictures/default-profile-picture.jpg')}
+                        />
+                    </Button>
+                </Div>
 
-                <Div style={styles.titleBalanceContainer}>
+                <Div >
                     <Title style={styles.title}>Finanças de {firstUserName}</Title>
 
                     <Text style={styles.balanceText}>
@@ -103,7 +105,19 @@ const Header = ({
                     </Text>
                 </Div>
 
-                <Div name="phantomDiv"></Div>
+                <Div>
+                    <Button
+                        style={styles.buttonHistoryTotalBalance}
+                        navigateTo={{ name: 'BalanceHistory', data: {} }}
+                    // onPress={() => handleMonthPress(selectedMonth - 1)}
+                    >
+                        <MaterialCommunityIcons
+                            name="history"
+                            color={Colors.blue}
+                            size={ScreenHeight * 0.025}
+                        />
+                    </Button>
+                </Div>
             </Div>
 
 
@@ -178,9 +192,6 @@ const styles = StyleSheet.create({
         height: ScreenHeight * 0.05,
         borderRadius: ScreenHeight * 0.025,
     },
-    titleBalanceContainer: {
-        marginRight: ScreenHeight * 0.05,
-    },
     title: {
         fontWeight: 'bold',
         marginTop: ScreenHeight * 0.01,
@@ -191,6 +202,13 @@ const styles = StyleSheet.create({
     balance: {
         fontWeight: 'bold',
         fontSize: ScreenWidth * 0.035,
+    },
+    buttonHistoryTotalBalance: {
+        button: {
+            minWidth: ScreenWidth * 0.1,
+            minHeight: ScreenHeight * 0.05,
+            backgroundColor: Colors.transparent,
+        }
     },
     secondLine: {
         alignItems: 'center',

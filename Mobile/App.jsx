@@ -18,6 +18,7 @@ import NewReleases from './src/pages/NewReleases.jsx';
 import UserSettings from './src/pages/UserSettings.jsx';
 import EditRelease from './src/pages/Home/EditRelease.jsx';
 import MonthEndClosing from './src/pages/MonthEndClosing.jsx';
+import BalanceHistory from './src/pages/Home/BalanceHistory.jsx';
 import ReleasesGrouped from './src/pages/Home/ReleasesGrouped.jsx';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -86,8 +87,9 @@ const App = () => {
         {newStackScreen(Loading.name, Loading.screen, Loading.config)}
         {newStackScreen('Main', MyTabs, { headerShown: false })}
         {newStackScreen(SignUp.name, SignUp.screen, SignUp.config)}
-        {newStackScreen(UserSettings.name, UserSettings.screen, UserSettings.config)}
         {newStackScreen(EditRelease.name, EditRelease.screen, EditRelease.config)}
+        {newStackScreen(UserSettings.name, UserSettings.screen, UserSettings.config)}
+        {newStackScreen(BalanceHistory.name, BalanceHistory.screen, BalanceHistory.config)}
         {newStackScreen(ReleasesGrouped.name, ReleasesGrouped.screen, ReleasesGrouped.config)}
       </Stack.Navigator>
     </NavigationContainer>

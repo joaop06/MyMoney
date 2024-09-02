@@ -124,7 +124,7 @@ const NewReleases = () => {
 
             // Adiciona o Novo Lançamento
             const fields = `type, title, userId, description, value, categoryId, dateRelease`
-            const values = `'${type}', '${title}', ${userId}, '${description}', ${parsedValue}, '${categoryRelease.id}', '${dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+            const values = `'${type}', '${title}', ${userId}, '${description}', ${parsedValue}, '${categoryRelease.id}', '${dateRelease.format('YYYY-MM-DD')}'`
             await Releases.create(fields, values)
 
             // Atualiza Saldo Total 
@@ -132,7 +132,7 @@ const NewReleases = () => {
 
             // Insere Logs de Saldo Total
             const fieldsTotal = `userId, value, dateRelease`
-            const valuesTotal = `${userId}, ${totalBalance}, '${dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+            const valuesTotal = `${userId}, ${totalBalance}, '${dateRelease.format('YYYY-MM-DD')}'`
             await TotalBalanceLogs.create(fieldsTotal, valuesTotal)
 
             // Redireciona para tela inicial

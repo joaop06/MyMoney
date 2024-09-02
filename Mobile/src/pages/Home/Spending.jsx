@@ -45,8 +45,11 @@ const Spending = () => {
 
     return (
         <Container style={styles.container}>
-            <Text style={styles.total}>
-                Despesas Totais: {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            <Text style={styles.totalSpendingTitle}>
+                {'Despesas Totais: '}
+                <Text style={styles.totalSpendingValue}>
+                    {(totalSpending).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </Text>
             </Text>
 
             {dataSpending === null || dataSpending.length === 0 ?
@@ -69,18 +72,21 @@ const styles = StyleSheet.create({
         width: ScreenWidth * 0.95,
         backgroundColor: Colors.transparent,
     },
-    total: {
+    totalSpendingTitle: {
         marginTop: ScreenHeight * 0.01,
         marginBottom: ScreenHeight * 0.02,
     },
+    totalSpendingValue: {
+        color: Colors.blue_lighten_1,
+        fontSize: ScreenWidth * 0.042,
+    },
     phantomDiv: {
-        elevation: 2,
         borderRadius: 10,
         width: ScreenWidth * 0.9,
-        height: ScreenHeight * 0.55,
         borderBottomLeftRadius: 20,
         borderBottomRightRadius: 20,
-        backgroundColor: Colors.grey_lighten_2,
+        height: ScreenHeight * 0.55,
+        backgroundColor: Colors.transparent,
     },
 })
 

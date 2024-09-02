@@ -79,7 +79,7 @@ module.exports = {
                     allowNull: true,
                 },
                 dateRelease: {
-                    type: 'DATETIME',
+                    type: 'DATE',
                     allowNull: true,
                 },
                 createdAt: {
@@ -149,7 +149,7 @@ module.exports = {
                     allowNull: true,
                 },
                 dateRelease: {
-                    type: 'DATETIME',
+                    type: 'DATE',
                     allowNull: true,
                 },
                 createdAt: {

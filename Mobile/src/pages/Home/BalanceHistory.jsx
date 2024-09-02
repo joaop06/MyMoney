@@ -1,16 +1,16 @@
-import moment from 'moment';
 import 'moment/locale/pt';
-moment.locale('pt');
-
-
+import moment from 'moment';
 import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { Colors } from '../../utils/Stylization';
+import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
+
+moment.locale('pt');
 import Div from '../../components/Div';
-import List from '../../components/List';
 import Text from '../../components/Text';
 import Title from '../../components/Title';
 import Button from '../../components/Button';
@@ -20,6 +20,8 @@ import Container from '../../components/Container';
 const config = { headerShown: false };
 
 const BalanceHistory = () => {
+    const navigation = useNavigation();
+
     const data = [
         { id: 0, month: 'Mai', balance: 0.01 },
         { id: 1, month: 'Jun', balance: 105.00 },
@@ -38,19 +40,22 @@ const BalanceHistory = () => {
                 <Div style={styles.containerButtonClose}>
                     <Button
                         style={styles.buttonClose}
-                        navigateTo={{ name: 'Home' }}
+                        onPress={() => navigation.goBack()}
                     >
                         <MaterialCommunityIcons
                             name="close"
                             color={Colors.white}
-                            size={ScreenHeight * 0.025}
+                            size={ScreenHeight * 0.035}
                         />
                     </Button>
                 </Div>
 
                 <Text style={styles.monthSelectedTitle}>
-                    {selectedMonth.current ? 'Saldo atual:' : 'Saldo em '}
-                    <Text style={{ color: Colors.white }}>{moment(selectedMonth.month, 'MMM').endOf('month').format('DD/MM/YYYY')}</Text>
+                    {selectedMonth.current ? 'Saldo atual é de:' : 'Saldo em '}
+
+                    <Text style={styles.monthSelectedDate}>
+                        {selectedMonth.current ? null : moment(selectedMonth.month, 'MMM').endOf('month').format('DD/MM/YYYY')}
+                    </Text>
                 </Text>
 
                 <Title style={styles.balanceSelectedTitle}>
@@ -60,31 +65,18 @@ const BalanceHistory = () => {
 
 
                 <Container style={styles.containerList}>
-                    {/* <List
-                    horizontal
-                    data={data}
-                    pagingEnabled
-                    style={styles.list}
-                    decelerationRate="fast"
-                    snapToAlignment="center"
-                    keyExtractor={(item) => item.id}
-                    showsHorizontalScrollIndicator={false}
-                    renderItem={({ item }) => (
-                        <Div style={styles.itemContainer}>
-                            <Text style={styles.month}>{item.month}</Text>
-                            <Text style={styles.balance}>{`R$ ${item.balance.toFixed(2)}`}</Text>
-                        </Div>
-                    )}
-                /> */}
-
                     {data.map((month, index) => (
-                        <Button
-                            style={styles.itemContainer}
-                            onPress={() => setSelectedMonth(month)}
+                        <LinearGradient
+                            key={index}
+                            colors={[Colors.transparent, month.month === selectedMonth.month ? Colors.blue_lighten_3 : Colors.blue_lighten_1]}
                         >
-                            <Text style={styles.month}>{month.month}</Text>
-                            {/* <Text style={styles.balance}>{`R$ ${month.balance.toFixed(2)}`}</Text> */}
-                        </Button>
+                            <Button
+                                style={styles.itemContainer}
+                                onPress={() => setSelectedMonth(month)}
+                            >
+                                <Text style={styles.month}>{month.current ? 'Hoje' : month.month}</Text>
+                            </Button>
+                        </LinearGradient>
                     ))}
                 </Container>
             </Div>
@@ -114,6 +106,8 @@ const styles = StyleSheet.create({
     buttonClose: {
         button: {
             minWidth: ScreenWidth * 0.1,
+            marginTop: ScreenHeight * 0.02,
+            marginLeft: ScreenWidth * 0.02,
             minHeight: ScreenHeight * 0.05,
             backgroundColor: Colors.transparent,
         }
@@ -122,30 +116,31 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         color: Colors.white,
     },
+    monthSelectedDate: {
+        color: Colors.white,
+    },
     balanceSelectedTitle: {
         color: Colors.white,
     },
     containerList: {
-        // maxWidth: ScreenWidth * 0.9,
         flexDirection: 'row',
         backgroundColor: Colors.transparent,
-
     },
     itemContainer: {
         button: {
-            minWidth: ScreenWidth * 0.15,
-            width: ScreenWidth * 0.1,
-            maxWidth: ScreenWidth * 0.1,
-            height: ScreenHeight * 0.3,
-            maxHeight: ScreenHeight * 0.3,
             borderRadius: 1,
-            backgroundColor: Colors.blue_lighten_1,
-            padding: ScreenHeight * 0.01,
-            borderColor: Colors.white,
-            // marginHorizontal: ScreenHeight * 0.008,
-            alignItems: 'center',
+            borderLeftWidth: 1,
             borderRightWidth: 1,
-            borderBottomWidth: 1,
+            alignItems: 'center',
+            borderBottomWidth: 2,
+            width: ScreenWidth * 0.1,
+            height: ScreenHeight * 0.3,
+            maxWidth: ScreenWidth * 0.1,
+            minWidth: ScreenWidth * 0.15,
+            padding: ScreenHeight * 0.01,
+            maxHeight: ScreenHeight * 0.3,
+            borderColor: Colors.grey_lighten_2,
+            backgroundColor: Colors.transparent,
         }
     },
     month: {
@@ -158,17 +153,5 @@ const styles = StyleSheet.create({
         color: Colors.white,
     },
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 export default { name: 'BalanceHistory', screen: BalanceHistory, config };

@@ -168,7 +168,7 @@ const EditRelease = ({ route }) => {
 
             // Insere Logs de Saldo Total
             const fieldsTotal = `userId, value, dateRelease`
-            const valuesTotal = `${releaseData.userId}, ${totalBalance}, '${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+            const valuesTotal = `${releaseData.userId}, ${totalBalance}, '${newReleaseData.dateRelease.format('YYYY-MM-DD')}'`
             await TotalBalanceLogs.create(fieldsTotal, valuesTotal)
 
             navigation.navigate('Home', { totalBalance });

@@ -300,6 +300,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 20,
         justifyContent: 'center',
+        maxWidth: ScreenWidth * 0.2,
         minWidth: ScreenWidth * 0.2,
         backgroundColor: type === origin ? Colors.blue : Colors.white,
     }),

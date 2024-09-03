@@ -1,10 +1,12 @@
 import 'moment/locale/pt';
 import moment from 'moment';
-import React, { useState } from 'react';
+import MMKV from '../../utils/MMKV/MMKV';
 import { StyleSheet } from 'react-native';
 import { Colors } from '../../utils/Stylization';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
+import TotalBalanceLogs from '../../Data/TotalBalanceLogs';
 import { ScreenWidth, ScreenHeight } from '../../utils/Dimensions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -21,18 +23,26 @@ const config = { headerShown: false };
 
 const BalanceHistory = () => {
     const navigation = useNavigation();
+    const [dataMonths, setDataMonths] = useState([]);
+    const [selectedMonth, setSelectedMonth] = useState({});
 
-    const data = [
-        { id: 0, month: 'Mai', balance: 0.01 },
-        { id: 1, month: 'Jun', balance: 105.00 },
-        { id: 2, month: 'Jul', balance: 241.09 },
-        { id: 3, month: 'Ago', balance: 1818.72, current: true }, // Mês atual
-        { id: 5, month: 'Set', balance: 1820.15 },
-        { id: 6, month: 'Out', balance: 1833.20 },
-        { id: 4, month: 'Nov', balance: 1844.07 },
-    ];
-    const [selectedMonth, setSelectedMonth] = useState(data.find(item => item.current))
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userId = await MMKV.find('userId');
+                const history = await TotalBalanceLogs.historyTotalBalance(userId);
+
+                console.log('Base de Dados dos meses: ', history)
+                setDataMonths(history)
+                setSelectedMonth(history.find(item => item.currentMonth))
+
+            } catch (e) {
+                console.error(`Erro ao buscar histórico de Saldo Total: `, e);
+            }
+        };
+        fetchData();
+    }, []);
 
     return (
         <Container style={styles.container}>
@@ -51,30 +61,30 @@ const BalanceHistory = () => {
                 </Div>
 
                 <Text style={styles.monthSelectedTitle}>
-                    {selectedMonth.current ? 'Saldo atual é de:' : 'Saldo em '}
+                    {selectedMonth.currentMonth ? 'Saldo atual é de:' : 'Saldo em '}
 
                     <Text style={styles.monthSelectedDate}>
-                        {selectedMonth.current ? null : moment(selectedMonth.month, 'MMM').endOf('month').format('DD/MM/YYYY')}
+                        {selectedMonth.currentMonth ? null : moment(selectedMonth.month, 'MMM').endOf('month').format('DD/MM/YYYY')}
                     </Text>
                 </Text>
 
                 <Title style={styles.balanceSelectedTitle}>
-                    {selectedMonth.balance.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    {(selectedMonth?.balance || 0.00).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </Title>
 
 
 
                 <Container style={styles.containerList}>
-                    {data.map((month, index) => (
+                    {dataMonths.map((month, index) => (
                         <LinearGradient
                             key={index}
-                            colors={[Colors.transparent, month.month === selectedMonth.month ? Colors.blue_lighten_3 : Colors.blue_lighten_1]}
+                            colors={[Colors.transparent, month?.month?.number === selectedMonth?.month?.number ? Colors.blue_lighten_3 : Colors.blue_lighten_1]}
                         >
                             <Button
                                 style={styles.itemContainer}
                                 onPress={() => setSelectedMonth(month)}
                             >
-                                <Text style={styles.month}>{month.current ? 'Hoje' : month.month}</Text>
+                                <Text style={styles.month}>{month.currentMonth ? 'Hoje' : month?.month?.name}</Text>
                             </Button>
                         </LinearGradient>
                     ))}

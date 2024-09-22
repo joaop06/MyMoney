@@ -25,6 +25,7 @@ export default class SQLite {
                 await instance.executeQuery('DROP TABLE Users')
                 await instance.executeQuery('DROP TABLE Releases')
                 await instance.executeQuery('DROP TABLE Categories')
+                await instance.executeQuery('DROP TABLE TotalBalanceLogs')
             }
 
 

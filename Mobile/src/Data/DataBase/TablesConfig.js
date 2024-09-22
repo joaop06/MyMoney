@@ -144,6 +144,10 @@ module.exports = {
                     type: 'INTEGER',
                     allowNull: false,
                 },
+                releaseId: {
+                    type: 'INTEGER',
+                    allowNull: false,
+                },
                 value: {
                     type: 'REAL',
                     allowNull: true,

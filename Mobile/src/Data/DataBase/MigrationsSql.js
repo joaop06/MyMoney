@@ -8,4 +8,5 @@ module.exports = [
     'ALTER TABLE `Categories` RENAME COLUMN type TO typeRelease;',
     'ALTER TABLE `Releases` MODIFY COLUMN dateRelease DATE;',
     'ALTER TABLE `TotalBalanceLogs` MODIFY COLUMN dateRelease DATE;',
+    'ALTER TABLE `TotalBalanceLogs` ADD COLUMN releaseId INTEGER;',
 ]

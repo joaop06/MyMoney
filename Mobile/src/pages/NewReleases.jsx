@@ -123,7 +123,8 @@ const NewReleases = () => {
             const userId = await MMKV.find('userId');
 
             // Adiciona o Novo Lançamento
-            const fields = `type, title, userId, description, value, categoryId, dateRelease`
+            // const fields = `type, title, userId, description, value, categoryId, dateRelease`
+            const fields = `type, title, userId, description, value, categoryId, createdAt`
             const values = `'${type}', '${title}', ${userId}, '${description}', ${parsedValue}, '${categoryRelease.id}', '${dateRelease.format('YYYY-MM-DD')}'`
             await Releases.create(fields, values)
 
@@ -131,7 +132,8 @@ const NewReleases = () => {
             const totalBalance = await Users.updateTotalBalance(userId);
 
             // Insere Logs de Saldo Total
-            const fieldsTotal = `userId, value, dateRelease`
+            // const fieldsTotal = `userId, value, dateRelease`
+            const fieldsTotal = `userId, value, createdAt`
             const valuesTotal = `${userId}, ${totalBalance}, '${dateRelease.format('YYYY-MM-DD')}'`
             await TotalBalanceLogs.create(fieldsTotal, valuesTotal)
 

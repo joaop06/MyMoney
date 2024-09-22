@@ -140,7 +140,18 @@ const EditRelease = ({ route }) => {
         const { userId } = releaseData
 
         await Releases.delete(releaseData.id);
-        navigation.navigate('Home', { totalBalance: await Users.updateTotalBalance(userId) });
+
+        // Atualiza Saldo Total 
+        const totalBalance = await Users.updateTotalBalance(userId);
+
+
+        // Insere Logs de Saldo Total
+        // const fieldsTotal = `userId, value, dateRelease`
+        const fieldsTotal = `userId, value, createdAt`
+        const valuesTotal = `${releaseData.userId}, ${totalBalance}, '${newReleaseData.dateRelease.format('YYYY-MM-DD')}'`
+        await TotalBalanceLogs.create(fieldsTotal, valuesTotal)
+
+        navigation.navigate('Home', { totalBalance });
     }
 
 
@@ -158,7 +169,8 @@ const EditRelease = ({ route }) => {
 
             // Atualiza os dados do Lançamento e Saldo Total
             const where = `WHERE id = ${releaseData.id}`
-            const fields = `value=${parsedValue}, type='${newReleaseData.type}', title='${newReleaseData.title.trim()}', categoryId=${newReleaseData.categoryId}, description='${newReleaseData.description.trim()}', dateRelease='${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+            // const fields = `value=${parsedValue}, type='${newReleaseData.type}', title='${newReleaseData.title.trim()}', categoryId=${newReleaseData.categoryId}, description='${newReleaseData.description.trim()}', dateRelease='${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
+            const fields = `value=${parsedValue}, type='${newReleaseData.type}', title='${newReleaseData.title.trim()}', categoryId=${newReleaseData.categoryId}, description='${newReleaseData.description.trim()}', createdAt='${newReleaseData.dateRelease.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]')}'`
             await Releases.update(fields, where)
 
 
@@ -167,7 +179,8 @@ const EditRelease = ({ route }) => {
 
 
             // Insere Logs de Saldo Total
-            const fieldsTotal = `userId, value, dateRelease`
+            // const fieldsTotal = `userId, value, dateRelease`
+            const fieldsTotal = `userId, value, createdAt`
             const valuesTotal = `${releaseData.userId}, ${totalBalance}, '${newReleaseData.dateRelease.format('YYYY-MM-DD')}'`
             await TotalBalanceLogs.create(fieldsTotal, valuesTotal)
 

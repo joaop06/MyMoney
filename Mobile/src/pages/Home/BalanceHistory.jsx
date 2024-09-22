@@ -33,7 +33,7 @@ const BalanceHistory = () => {
                 const userId = await MMKV.find('userId');
                 const history = await TotalBalanceLogs.historyTotalBalance(userId);
 
-                console.log('Base de Dados dos meses: ', history)
+                // console.log('Base de Dados dos meses: ', history)
                 setDataMonths(history)
                 setSelectedMonth(history.find(item => item.currentMonth))
 
@@ -64,7 +64,7 @@ const BalanceHistory = () => {
                     {selectedMonth.currentMonth ? 'Saldo atual é de:' : 'Saldo em '}
 
                     <Text style={styles.monthSelectedDate}>
-                        {selectedMonth.currentMonth ? null : moment(selectedMonth.month, 'MMM').endOf('month').format('DD/MM/YYYY')}
+                        {selectedMonth.currentMonth ? null : moment(selectedMonth?.lastDate).format('DD/MM/YYYY')}
                     </Text>
                 </Text>
 

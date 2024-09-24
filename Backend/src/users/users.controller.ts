@@ -16,10 +16,10 @@ export class UsersController {
         return this.usersService.findOne(+id);
     }
 
-    @Post()
-    create(@Body() userObject: UserEntity): Promise<UserEntity> {
-        return this.usersService.create(userObject);
-    }
+    // @Post()
+    // create(@Body() userObject: UserEntity): Promise<UserEntity> {
+    //     return this.usersService.create(userObject);
+    // }
 
     @Patch(':id')
     update(@Param('id') id: string, @Body() userObject: Partial<UserEntity>): Promise<any> {

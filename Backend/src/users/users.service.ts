@@ -18,12 +18,22 @@ export class UsersService {
         return await this.usersRepository.findOneBy({ id });
     }
 
-    async create(object: UserEntity): Promise<UserEntity> {
-        return await this.usersRepository.save(object);
+    async findOneByEmail(email: string): Promise<UserEntity> {
+        return await this.usersRepository.findOneBy({ email });
+    }
+
+    async create(object: UserEntity): Promise<any> {
+        const resutl = await this.usersRepository.save(object);
+        const { password, ...newUser } = resutl;
+        return newUser;
     }
 
     async update(id: number, object: Partial<UserEntity>): Promise<any> {
         return await this.usersRepository.update(id, object);
+    }
+
+    async updatePassword(id: number, newPassword: string): Promise<any> {
+        return await this.usersRepository.update(id, { password: newPassword });
     }
 
     async remove(id: number): Promise<any> {

@@ -1,0 +1,3 @@
+[submodule "Api"]
+	path = Api
+	url = git@github.com:joaop06/MyMoney-Api.git

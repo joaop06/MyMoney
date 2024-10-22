@@ -1,7 +1,10 @@
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Injectable } from '@nestjs/common';
+import { LoginDto } from './dtos/login.dto';
+import { ValidUserDto } from './dtos/valid-user.dto';
 import { UsersService } from 'src/users/users.service';
+import { ValidatedLoginDto } from './dtos/validated-login.dto';
 
 @Injectable()
 export class AuthService {
@@ -10,7 +13,8 @@ export class AuthService {
         private jwtService: JwtService,
     ) { }
 
-    async validateUser(email: string, password: string): Promise<any> {
+    async validateUser(object: LoginDto): Promise<ValidUserDto> {
+        const { email, password } = object;
         const user = await this.usersService.findOneByEmail(email);
 
         if (user && await bcrypt.compare(password, user.password)) {
@@ -21,24 +25,12 @@ export class AuthService {
         return null;
     }
 
-    async login(user: any) {
+    async login(user: ValidUserDto): Promise<ValidatedLoginDto> {
         const payload = { email: user.email, sub: user.id };
 
-        return { accessToken: this.jwtService.sign(payload) };
-    }
-
-    async register(userData: any) {
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-        return await this.usersService.create({ ...userData, password: hashedPassword });
-    }
-
-    async changePassword(userId: number, changePasswordDto: { oldPassword: string; newPassword: string }) {
-        const user = await this.usersService.findOne(userId);
-
-        const passwordMatch = await bcrypt.compare(changePasswordDto.oldPassword, user.password);
-        if (!passwordMatch) throw new Error('Invalid old password');
-
-        const newHashedPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
-        return await this.usersService.updatePassword(userId, newHashedPassword);
+        return {
+            message: 'Login realizado com sucesso!',
+            accessToken: this.jwtService.sign(payload)
+        };
     }
 }

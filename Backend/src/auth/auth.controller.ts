@@ -1,30 +1,33 @@
+import { LoginDoc } from './doc/login.doc';
+import { LoginDto } from './dtos/login.dto';
 import { AuthService } from './auth.service';
-// import {LocalAuthGuard} from './local-auth.guard';
-import { Post, Body, Request, UseGuards, Controller } from '@nestjs/common';
+import { Public } from './jwt/jwt-auth-guard';
+import { Post, Body, Controller } from '@nestjs/common';
+import { ValidatedLoginDto } from './dtos/validated-login.dto';
+import { DynamicException } from 'interceptors/dynamic-exception';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
     constructor(private authService: AuthService) { }
 
+    @Public()
     @Post('login')
-    async login(@Body() loginDto: { email: string; password: string }) {
-        const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+    @ApiBody(LoginDoc.body)
+    @ApiOperation(LoginDoc.operation)
+    @ApiOkResponse(LoginDoc.okResponse)
+    @ApiUnauthorizedResponse(LoginDoc.unauthorized)
+    async login(@Body() object: LoginDto): Promise<ValidatedLoginDto> {
+        try {
+            const user = await this.authService.validateUser(object);
 
-        if (!user) {
-            return { message: 'Invalid credentials' };
+            if (!user) throw new Error('Credenciais inválidas');
+
+            return await this.authService.login(user);
+
+        } catch (e) {
+            new DynamicException(e, 'Authentication', 'pt');
         }
-
-        return await this.authService.login(user);
-    }
-
-    @Post('register')
-    async register(@Body() registerDto: { email: string; password: string }) {
-        return await this.authService.register(registerDto);
-    }
-
-    @Post('change-password')
-    // @UseGuards(JwtAuthGuard)
-    async changePassword(@Request() req, @Body() changePasswordDto: { oldPassword: string; newPassword: string }) {
-        return this.authService.changePassword(req.user.id, changePasswordDto);
     }
 }

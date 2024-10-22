@@ -1,4 +1,4 @@
-import { JwtStrategy } from '../../src/auth/jwt.strategy';
+import { JwtStrategy } from '../../src/auth/jwt/jwt.strategy';
 
 describe('JwtStrategy', () => {
   it('should be defined', () => {

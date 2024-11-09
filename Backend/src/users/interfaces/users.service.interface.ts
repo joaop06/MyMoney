@@ -3,7 +3,7 @@ import { CreateUserDto } from "../dtos/create-user.dto";
 import { UpdateUserDto } from "../dtos/update-user.dto";
 import { UserReturnDto } from "../dtos/user-return.dto";
 import { ChangePasswordDto } from "../dtos/change-password.dto";
-import { ServiceInterface } from "interfaces/service.interface";
+import { ServiceInterface } from "../../../interfaces/service.interface";
 
 export interface UsersServiceInterface extends ServiceInterface<
     Entity,

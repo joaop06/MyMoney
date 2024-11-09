@@ -3,8 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { AllExceptionFilter } from 'interceptors/all-exception-filter';
-import { FindOptionsMiddleware } from 'middlewares/find-options.middleware';
+import { AllExceptionFilter } from '../interceptors/all-exception-filter';
+import { FindOptionsMiddleware } from '../middlewares/find-options.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

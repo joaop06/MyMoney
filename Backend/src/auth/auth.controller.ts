@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { Public } from './jwt/jwt-auth-guard';
 import { Post, Body, Controller } from '@nestjs/common';
 import { ValidatedLoginDto } from './dtos/validated-login.dto';
-import { DynamicException } from 'interceptors/dynamic-exception';
+import { DynamicException } from '../../interceptors/dynamic-exception';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 @ApiTags('auth')

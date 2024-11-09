@@ -3,11 +3,11 @@ import { UserEntity } from './user.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { QueryFailedError, Repository } from 'typeorm';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserReturnDto } from './dtos/user-return.dto';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { FindOptionsDto, FindReturnModelDto } from 'dtos/find.dto';
-import { FindManyOptions, QueryFailedError, Repository } from 'typeorm';
 import { UsersServiceInterface } from './interfaces/users.service.interface';
 
 @Injectable()
@@ -16,9 +16,6 @@ export class UsersService implements UsersServiceInterface {
         @InjectRepository(UserEntity)
         private repository: Repository<UserEntity>
     ) { }
-    findAll(options: FindOptionsDto<UserEntity>): Promise<FindReturnModelDto<UserReturnDto>> {
-        throw new Error('Method not implemented.');
-    }
 
     removePassword(user: UserEntity) {
         delete user?.password;

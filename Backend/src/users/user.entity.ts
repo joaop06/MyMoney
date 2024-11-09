@@ -22,7 +22,7 @@ export class UserEntity {
     password: string;
 
     @Column({ default: 0.00 })
-    totalBalance: number;
+    totalBalance: number = 0.00;
 
     @CreateDateColumn()
     createdAt: Date;

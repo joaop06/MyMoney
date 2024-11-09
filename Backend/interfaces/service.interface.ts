@@ -9,5 +9,5 @@ export interface ServiceInterface<Entity, CreateDto, EntityReturnDto = Entity> {
 
     update(id: number, object: Partial<Entity>): Promise<any>
 
-    findAll(options: FindOptionsDto<Entity>): Promise<FindReturnModelDto<EntityReturnDto>>
+    findAll?(options: FindOptionsDto<Entity>): Promise<FindReturnModelDto<EntityReturnDto>>
 }

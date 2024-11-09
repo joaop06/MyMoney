@@ -2,7 +2,6 @@ import { UserEntity } from "../user.entity";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { UserReturnDto } from "../dtos/user-return.dto";
 import { ChangePasswordDto } from "../dtos/change-password.dto";
-import { FindOptionsDto, FindReturnModelDto } from "dtos/find.dto";
 
 export interface UsersControllerInterface {
     delete?(id: string): Promise<any>

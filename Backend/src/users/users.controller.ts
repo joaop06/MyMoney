@@ -1,5 +1,4 @@
 import { CreateDoc } from './doc/create.doc';
-import { DeleteDoc } from './doc/delete.doc';
 import { UpdateDoc } from './doc/update.doc';
 import { UsersService } from './users.service';
 import { FindOneDoc } from './doc/find-one.doc';
@@ -10,30 +9,14 @@ import { UserReturnDto } from './dtos/user-return.dto';
 import { ChangePasswordDoc } from './doc/change-password.doc';
 import { ChangePasswordDto } from './dtos/change-password.dto';
 import { DynamicException } from 'interceptors/dynamic-exception';
+import { Controller, Get, Post, Param, Body, Patch } from '@nestjs/common';
 import { UsersControllerInterface } from './interfaces/users.controller.interface';
-import { Controller, Get, Post, Delete, Param, Body, Patch } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBody, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController implements UsersControllerInterface {
     constructor(private readonly service: UsersService) { }
-
-    @Delete(':id')
-    @ApiParam(DeleteDoc.param)
-    @ApiOperation(DeleteDoc.operation)
-    @ApiOkResponse(DeleteDoc.okResponse)
-    @ApiBadRequestResponse(DeleteDoc.badRequest)
-    async delete(@Param('id') id: string): Promise<any> {
-        try {
-            const result = await this.service.delete(+id);
-            return { message: 'Sucesso ao deletar', affected: result.affected };
-
-        } catch (error) {
-            error.message = `Erro ao deletar: ${error.message}`;
-            new DynamicException(error, 'User');
-        }
-    }
 
     @Post('change-password')
     @ApiBody(ChangePasswordDoc.body)

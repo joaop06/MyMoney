@@ -1,7 +1,7 @@
 import { FindOptionsDto, FindReturnModelDto } from "dtos/find.dto";
 
 export interface ControllerInterface<Entity, CreateDto, EntityReturnDto = Entity> {
-    delete(id: string): Promise<any>
+    delete?(id: string): Promise<any>
 
     findOne(id: string): Promise<EntityReturnDto>
 
